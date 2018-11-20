@@ -20,7 +20,7 @@ public class DoQuery {
             final IndexSearcher searcher = new IndexSearcher(reader);
             searcher.setQueryCache(null);
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))) {
-                final QueryParser queryParser = new QueryParser("text", new StandardAnalyzer(CharArraySet.EMPTY_SET));
+                final QueryParser queryParser = new QueryParser("body", new StandardAnalyzer(CharArraySet.EMPTY_SET));
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     final String[] fields = line.trim().split("\t");

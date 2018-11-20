@@ -17,8 +17,9 @@ fn main() {
 
 fn create_schema() -> Schema {
   let mut schema_builder = SchemaBuilder::default();
-  schema_builder.add_text_field("id", STORED);
-  schema_builder.add_text_field("text", TEXT);
+  schema_builder.add_text_field("url", STORED);
+  schema_builder.add_text_field("title", TEXT);
+  schema_builder.add_text_field("body", TEXT);
   schema_builder.build()
 }
 

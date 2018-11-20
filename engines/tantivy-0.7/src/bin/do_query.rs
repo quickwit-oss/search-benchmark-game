@@ -17,7 +17,7 @@ fn main() {
 
 fn main_inner(index_dir: &Path) -> tantivy::Result<()> {
     let index = Index::open_in_dir(index_dir).expect("failed to open index");
-    let text_field = index.schema().get_field("text").expect("no all field?!");
+    let text_field = index.schema().get_field("body").expect("no all field?!");
     let query_parser = QueryParser::new(
         index.schema(),
         vec![text_field],

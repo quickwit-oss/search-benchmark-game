@@ -24,10 +24,12 @@ public class BuildIndex {
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))) {
                 final Document document = new Document();
 
-                StoredField idField = new StoredField("id",     "");
-                TextField textField = new TextField("text", "", Field.Store.NO);
+                StoredField idField = new StoredField("url",     "");
+                TextField titleField = new TextField("title", "", Field.Store.NO);
+                TextField textField = new TextField("body", "", Field.Store.NO);
 
                 document.add(idField);
+                document.add(titleField);
                 document.add(textField);
 
                 String line;
@@ -36,15 +38,18 @@ public class BuildIndex {
                         continue;
                     }
                     final JsonObject parsed_doc = Json.parse(line).asObject();
-                    final String id = parsed_doc.get("id").asString();
-                    final String text = parsed_doc.get("text").asString();
+                    final String id = parsed_doc.get("url").asString();
+                    final String text = parsed_doc.get("body").asString();
+                    final String title = parsed_doc.get("title").asString();
                     idField.setStringValue(id);
                     textField.setStringValue(text);
+                    titleField.setStringValue(title);
                     writer.addDocument(document);
                 }
             }
 
             writer.commit();
+            writer.forceMerge(1, true);
         }
     }
 }
