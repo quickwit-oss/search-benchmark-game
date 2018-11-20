@@ -29,7 +29,6 @@ fn main_inner(output_dir: &Path) -> tantivy::Result<()> {
     let index = Index::create_in_dir(output_dir, schema.clone()).expect("failed to create index");
 
     {
-        // 4 GB heap
         let mut index_writer = index.writer(1_500_000_000).expect("failed to create index writer");
 
         let stdin = std::io::stdin();
