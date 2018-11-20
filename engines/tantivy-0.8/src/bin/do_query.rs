@@ -35,7 +35,7 @@ fn main_inner(index_dir: &Path) -> tantivy::Result<()> {
         let count;
         match command {
             "COUNT" => {
-                count = searcher.search(&query, &Count)?;
+                count = query.count(&searcher)?;
             }
             "TOP_10" => {
                 let _top_k = searcher.search(&query, &TopDocs::with_limit(10))?;
