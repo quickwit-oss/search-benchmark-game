@@ -4,7 +4,7 @@
 This repository is standardized benchmark for comparing the speed of various
 aspects of search engine technologies.
 
-The results are available [here](https://fulmicoton.com/search-bench/).
+The results are available [here](https://tantivy-search.github.io/bench/).
 
 This benchmark is both
 - **for users** to make it easy for users to compare different libraries
