@@ -29,6 +29,11 @@ class SearchClient:
         recv = self.process.stdout.readline()
         return int(recv)
 
+    def close(self):
+        self.process.stdin.close()
+        self.process.stdout.close()
+        self.process.stderr.close()
+
 def drive(queries, client, command):
     for query in queries:
         start = time.monotonic()
@@ -72,10 +77,10 @@ if __name__ == "__main__":
                 }
                 query_idx[query.query] = query_result
                 engine_results.append(query_result)
-            print("\n\n\n======================")
-            print("BENCHMARKING %s" % engine)
+            print("======================")
+            print("BENCHMARKING %s %s" % (engine, command))
             search_client = SearchClient(engine)
-            print("- Warming up ...")
+            print("--- Warming up ...")
             queries_shuffled = list(queries[:])
             random.seed(2)
             random.shuffle(queries_shuffled)
@@ -90,6 +95,7 @@ if __name__ == "__main__":
             for query in engine_results:
                 query["duration"].sort()
             results_commands[engine] = engine_results
+            search_client.close()
         print(results_commands.keys())
         results[command] = results_commands
     with open("results.json" , "w") as f:

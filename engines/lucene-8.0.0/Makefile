@@ -1,18 +1,20 @@
 clean:
-	rm -fr idx
-	rm -fr build
+	@echo "--- Cleaning Lucene 8.0.0 ---"
+	@rm -fr idx
+	@rm -fr build
 
 compile: build
 
 serve:
-		@java -cp build/libs/search-index-benchmark-game-lucene-1.0-SNAPSHOT-all.jar DoQuery idx
+	@java -cp build/libs/search-index-benchmark-game-lucene-1.0-SNAPSHOT-all.jar DoQuery idx
 
 # ------------------------
 index: idx
 
 build:
-	gradle clean shadowJar
+	@echo "--- Building Lucene 8.0.0 ---"
+	@gradle clean shadowJar
 
 idx: build
-	@echo "---- Indexing Lucene ----"
-	java -server -cp build/libs/search-index-benchmark-game-lucene-1.0-SNAPSHOT-all.jar BuildIndex idx < $(CORPUS)
+	@echo "--- Indexing Lucene 8.0.0 ---"
+	@java -server -cp build/libs/search-index-benchmark-game-lucene-1.0-SNAPSHOT-all.jar BuildIndex idx < $(CORPUS)

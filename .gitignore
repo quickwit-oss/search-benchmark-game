@@ -16,3 +16,6 @@ engines/lucene/.gradle
 **/.cargo
 **/perf.data*
 **/flamegraph.svg
+wiki-articles.json.bz2
+wiki-articles.json
+corpus.json
