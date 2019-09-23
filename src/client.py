@@ -27,12 +27,14 @@ class SearchClient:
         self.process.stdin.write(query_line.encode("utf-8"))
         self.process.stdin.flush()
         recv = self.process.stdout.readline()
-        return int(recv)
+        cnt = int(recv)
+        #print("query=%s count=%d" % (query, cnt))
+        return cnt
 
     def close(self):
         self.process.stdin.close()
         self.process.stdout.close()
-        self.process.stderr.close()
+        #self.process.stderr.close()
 
 def drive(queries, client, command):
     for query in queries:

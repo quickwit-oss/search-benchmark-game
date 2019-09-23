@@ -5,6 +5,7 @@ results
 benchmark/target
 tantivy/target
 lucene/build
+engines/bleve-*/bin/
 engines/lucene/.gradle
 **/idx
 **/build

@@ -1,12 +1,13 @@
 CORPUS = $(shell pwd)/corpus.json
 export
 
-COMMANDS = COUNT TOP_10 TOP_10_COUNT
+# COMMANDS = COUNT TOP_10 TOP_10_COUNT
 # COMMANDS = COUNT
 # COMMANDS = TOP_10
+COMMANDS = TOP_10_COUNT
 
-ENGINES = bleve-0.8.0-boltdb bleve-0.8.0-moss bleve-0.8.0-scorch lucene-7.2.1 lucene-8.0.0 tantivy-0.9
-# ENGINES = bleve-0.8.0-boltdb
+ENGINES = bleve-0.8.0-boltdb bleve-0.8.0-scorch lucene-7.2.1 lucene-8.0.0 tantivy-0.9
+# ENGINES = lucene-7.2.1 lucene-8.0.0
 
 all: index
 
@@ -44,4 +45,5 @@ compile:
 serve:
 	@echo "--- Serving results ---"
 	@cp results.json web/output/results.json
-	@cd web/output && python -m SimpleHTTPServer 8000
+	#@cd web/output && python -m SimpleHTTPServer 80
+	@cd web/output && python3 -m http.server 80
