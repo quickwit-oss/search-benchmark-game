@@ -17,4 +17,4 @@ target/release/%:
 idx: target/release/build_index
 	@echo "--- Indexing tantivy 0.7 ---"
 	@mkdir -p idx
-	@export RUST_LOG=info && target/release/build_index "$@" < ${CORPUS}
+	export RUST_LOG=info && target/release/build_index "$@" < ${CORPUS}

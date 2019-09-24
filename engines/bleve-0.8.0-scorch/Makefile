@@ -47,4 +47,4 @@ build:
 
 idx: build
 	@echo "--- Indexing Bleve 0.8.0 scorch ---"
-	@./bin/build_index ./idx "$@" < ${CORPUS}
+	./bin/build_index ./idx "$@" < ${CORPUS}

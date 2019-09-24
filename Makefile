@@ -1,23 +1,28 @@
 CORPUS = $(shell pwd)/corpus.json
 export
 
-# COMMANDS = COUNT TOP_10 TOP_10_COUNT
+WIKI_SRC = "https://www.dropbox.com/s/wwnfnu441w1ec9p/wiki-articles.json.bz2"
+WIKI_DEST = $(shell pwd)/wiki-articles.json.bz2
+WIKI_JSON = $(shell pwd)/wiki-articles.json
+
+
+COMMANDS = COUNT TOP_10 TOP_10_COUNT
 # COMMANDS = COUNT
 # COMMANDS = TOP_10
-COMMANDS = TOP_10_COUNT
+# COMMANDS = TOP_10_COUNT
 
-# ENGINES = bleve-0.8.0-scorch lucene-7.2.1 lucene-8.0.0 tantivy-0.9
-ENGINES = tantivy-0.9
+ENGINES = bleve-0.8.0-scorch lucene-8.0.0 tantivy-0.9
+# ENGINES = tantivy-0.9
 
 all: index
 
 corpus:
-	@echo "--- Downloading wiki-articles.json.bz2 ---"
-	@curl -# -L "https://www.dropbox.com/s/wwnfnu441w1ec9p/wiki-articles.json.bz2" > $(shell pwd)/wiki-articles.json.bz2
-	@echo "--- Extracting wiki-articles.json.bz2 ---"
-	@bunzip2 -f $(shell pwd)/wiki-articles.json.bz2
-	@echo "--- Creating corpus.json ---"
-	@jq -c '. | {id: .url, text: .body}' $(shell pwd)/wiki-articles.json > $(CORPUS)
+	@echo "--- Downloading $(WIKI_SRC) ---"
+	@curl -# -L "$(WIKI_SRC)" > $(WIKI_DEST)
+	@echo "--- Extracting $(WIKI_DEST) ---"
+	@bunzip2 -f $(WIKI_DEST)
+	@echo "--- $(CORPUS) ---"
+	@jq -c '. | {id: .url, text: .body}' $(WIKI_JSON) > $(CORPUS)
 
 clean:
 	@echo "--- Cleaning directories ---"

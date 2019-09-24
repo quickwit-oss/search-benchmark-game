@@ -34,7 +34,6 @@ class SearchClient:
     def close(self):
         self.process.stdin.close()
         self.process.stdout.close()
-        #self.process.stderr.close()
 
 def drive(queries, client, command):
     for query in queries:
