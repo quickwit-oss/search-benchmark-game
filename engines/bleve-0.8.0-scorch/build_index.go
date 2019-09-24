@@ -8,16 +8,19 @@ import (
 	"os"
 
 	"github.com/blevesearch/bleve"
-	"github.com/blevesearch/bleve/analysis/analyzer/standard"
+	"github.com/blevesearch/bleve/analysis"
+	"github.com/blevesearch/bleve/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
 	_ "github.com/blevesearch/bleve/config"
 	"github.com/blevesearch/bleve/index/scorch"
+	"github.com/blevesearch/bleve/registry"
 )
 
 func main() {
 	outputDir := os.Args[1]
 
 	textFieldMapping := bleve.NewTextFieldMapping()
-	textFieldMapping.Analyzer = standard.Name
+	textFieldMapping.Analyzer = StandardAnalyzerWithStopWords
 	textFieldMapping.Store = false
 	textFieldMapping.IncludeInAll = false
 
@@ -120,4 +123,28 @@ func main() {
 	fmt.Println(docCount)
 
 	fmt.Println("Does not support index marge")
+}
+
+func NewStandardAnalyzerWithStopWords(config map[string]interface{}, cache *registry.Cache) (*analysis.Analyzer, error) {
+	tokenizer, err := cache.TokenizerNamed(unicode.Name)
+	if err != nil {
+		return nil, err
+	}
+	toLowerFilter, err := cache.TokenFilterNamed(lowercase.Name)
+	if err != nil {
+		return nil, err
+	}
+	rv := analysis.Analyzer{
+		Tokenizer: tokenizer,
+		TokenFilters: []analysis.TokenFilter{
+			toLowerFilter,
+		},
+	}
+	return &rv, nil
+}
+
+const StandardAnalyzerWithStopWords = "standard-with-stopwords"
+
+func init() {
+	registry.RegisterAnalyzer(StandardAnalyzerWithStopWords, NewStandardAnalyzerWithStopWords)
 }
