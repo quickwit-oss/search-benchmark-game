@@ -1,4 +1,5 @@
 clean:
+	@echo "--- Cleaning tantivy 0.7 ---"
 	@rm -fr idx
 	@rm -fr target
 
@@ -10,10 +11,10 @@ serve: target/release/do_query
 	@target/release/do_query idx
 
 target/release/%:
-	@echo "--- Building tantivy 0.7.0 ---"
+	@echo "--- Building tantivy 0.7 ---"
 	@cargo build --release --bin $(notdir $@)
 
 idx: target/release/build_index
-	@echo "--- Indexing tantivy 0.7.0 ---"
+	@echo "--- Indexing tantivy 0.7 ---"
 	@mkdir -p idx
 	@export RUST_LOG=info && target/release/build_index "$@" < ${CORPUS}
