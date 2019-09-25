@@ -7,6 +7,11 @@ import (
 	"strings"
 
 	"github.com/blevesearch/bleve"
+	"github.com/blevesearch/bleve/analysis"
+	"github.com/blevesearch/bleve/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
+	_ "github.com/blevesearch/bleve/config"
+	"github.com/blevesearch/bleve/registry"
 )
 
 func main() {
@@ -16,12 +21,12 @@ func main() {
 	defer func() {
 		err = index.Close()
 		if err != nil {
-			fmt.Println("ERROR")
+			fmt.Sprintf("ERROR: %v", err)
 			return
 		}
 	}()
 	if err != nil {
-		fmt.Println("ERROR")
+		fmt.Sprintf("ERROR: %v", err)
 		return
 	}
 
@@ -38,7 +43,7 @@ func main() {
 		case "COUNT":
 			searchResult, err := index.Search(searchRequest)
 			if err != nil {
-				fmt.Println("ERROR")
+				fmt.Sprintf("ERROR: %v", err)
 				continue
 			}
 			count = searchResult.Total
@@ -46,7 +51,7 @@ func main() {
 			searchRequest.Size = 10
 			_, err := index.Search(searchRequest)
 			if err != nil {
-				fmt.Println("ERROR")
+				fmt.Sprintf("ERROR: %v", err)
 				continue
 			}
 			count = 1
@@ -54,7 +59,7 @@ func main() {
 			searchRequest.Size = 10
 			searchResult, err := index.Search(searchRequest)
 			if err != nil {
-				fmt.Println("ERROR")
+				fmt.Sprintf("ERROR: %v", err)
 				continue
 			}
 			count = searchResult.Total
@@ -64,4 +69,28 @@ func main() {
 		}
 		fmt.Println(count)
 	}
+}
+
+func NewStandardAnalyzerWithStopWords(config map[string]interface{}, cache *registry.Cache) (*analysis.Analyzer, error) {
+	tokenizer, err := cache.TokenizerNamed(unicode.Name)
+	if err != nil {
+		return nil, err
+	}
+	toLowerFilter, err := cache.TokenFilterNamed(lowercase.Name)
+	if err != nil {
+		return nil, err
+	}
+	rv := analysis.Analyzer{
+		Tokenizer: tokenizer,
+		TokenFilters: []analysis.TokenFilter{
+			toLowerFilter,
+		},
+	}
+	return &rv, nil
+}
+
+const StandardAnalyzerWithStopWords = "standard-with-stopwords"
+
+func init() {
+	registry.RegisterAnalyzer(StandardAnalyzerWithStopWords, NewStandardAnalyzerWithStopWords)
 }

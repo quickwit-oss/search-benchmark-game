@@ -12,7 +12,11 @@ COMMANDS = COUNT TOP_10 TOP_10_COUNT
 # COMMANDS = TOP_10_COUNT
 
 ENGINES = bleve-0.8.0-scorch lucene-8.0.0 tantivy-0.9
+# ENGINES = bleve-0.8.0-scorch
+# ENGINES = lucene-8.0.0
 # ENGINES = tantivy-0.9
+
+PORT = 8080
 
 all: index
 
@@ -46,4 +50,4 @@ compile:
 serve:
 	@echo "--- Serving results ---"
 	@cp results.json web/output/results.json
-	@cd web/output && python3 -m http.server 80
+	@cd web/output && python3 -m http.server $(PORT)

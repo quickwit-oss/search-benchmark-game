@@ -6,7 +6,7 @@ import json
 import random
 from collections import defaultdict
 
-COMMANDS = ["COUNT", "TOP_10", "TOP_10_COUNT"]
+COMMANDS = os.environ['COMMANDS'].split(' ')
 
 class SearchClient:
 
@@ -28,7 +28,6 @@ class SearchClient:
         self.process.stdin.flush()
         recv = self.process.stdout.readline()
         cnt = int(recv)
-        #print("query=%s count=%d" % (query, cnt))
         return cnt
 
     def close(self):
