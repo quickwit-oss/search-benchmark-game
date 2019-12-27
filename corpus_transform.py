@@ -8,9 +8,18 @@ def transform(text):
     return PTN.sub(" ", text.lower())
 
 for line in fileinput.input():
-    doc = json.loads(line)
+    doc = {}
+    try:
+        doc = json.loads(line)
+    except ValueError:
+        continue
+
+    if doc["url"] == "":
+        continue
+
     doc_transformed = {
         "id": doc["url"],
         "text": transform(doc["body"])
     }
-    print json.dumps(doc_transformed)
+
+    print(json.dumps(doc_transformed))

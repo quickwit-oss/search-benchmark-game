@@ -11,7 +11,7 @@ all: index
 
 corpus:
 	@echo "--- Downloading $(WIKI_SRC) ---"
-	@curl -# -L "$(WIKI_SRC)" | bunzip2 -c | python corpus_transform.py > $(CORPUS) 
+	@curl -# -L "$(WIKI_SRC)" | bunzip2 -c | python3 corpus_transform.py > $(CORPUS)
 
 clean:
 	@echo "--- Cleaning directories ---"
