@@ -38,10 +38,10 @@ set(PISA_ENABLE_TESTING OFF CACHE BOOL "skip testing")
 set(PISA_ENABLE_BENCHMARKING OFF CACHE BOOL "skip benchmarking")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pisa EXCLUDE_FROM_ALL)
 
-
 add_executable(build_index tools/build_index.cpp)
 target_link_libraries(build_index
   pisa
+  nlohmann_json
 )
 
 add_executable(do_query tools/do_query.cpp)
