@@ -15,7 +15,6 @@ build/bin/%:
 	@mkdir -p build
 	@cmake -B build/ .
 	@make -C build/
-# 	@cargo build --release --bin $(notdir $@)
 
 idx: build/bin/build_index
 	@echo "--- Indexing PISA 0.8.0 ---"
