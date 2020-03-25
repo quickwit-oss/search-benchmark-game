@@ -21,9 +21,9 @@ int main(int argc, char const *argv[]) {
   spdlog::drop("");
   spdlog::set_default_logger(spdlog::stderr_color_mt(""));
 
-  std::string terms_file;
-  std::string wand_data_filename;
-  std::string index_filename;
+  std::string terms_file = "termlex";
+  std::string wand_data_filename = "wand";
+  std::string index_filename = "index";
 
   std::string stemmer = "porter2";
   std::string scorer_name = "bm25";
