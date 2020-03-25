@@ -14,14 +14,21 @@ int main(int argc, char const *argv[])
     std::string terms_file;
     std::string stemmer = "porter2";
 
-    auto term_processor = pisa::TermProcessor(terms_file, std::nullopt, stemmer);
+    // auto term_processor = pisa::TermProcessor(terms_file, std::nullopt, stemmer);
     std::string line;
     while (std::getline(std::cin, line))
     {
         size_t count = 0;
         std::vector<std::string> tokens;
         boost::split(tokens, line, boost::is_any_of("\t"));
-        pisa::Query q = pisa::parse_query_terms(tokens[1], term_processor);
+        if(boost::starts_with(tokens[1], "\"")){
+            std::cout << "UNSUPPORTED\n";
+            continue;
+        } else if(boost::starts_with(tokens[1], "+")){
+            // AND Query
+        }
+
+        // pisa::Query q = pisa::parse_query_terms(tokens[1], term_processor);
         if(tokens[0] == "COUNT"){
 
         } else if(tokens[0] == "TOP_10"){
