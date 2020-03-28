@@ -42,10 +42,6 @@ add_executable(build_index tools/build_index.cpp)
 target_link_libraries(build_index
     pisa
     nlohmann_json
-    fmt
-    Porter2
-    Boost::boost
-    mio
 )
 
 add_executable(do_query tools/do_query.cpp)
