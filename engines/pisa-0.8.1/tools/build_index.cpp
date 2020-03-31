@@ -18,8 +18,8 @@
 
 static std::size_t const THREADS = std::thread::hardware_concurrency();
 static std::size_t const BATCH_SIZE = 10'000;
-static std::string const FWD = "/tmp/fwd";
-static std::string const INV = "/tmp/inv";
+static std::string const FWD = "fwd";
+static std::string const INV = "inv";
 static pisa::BlockSize const BLOCK_SIZE = pisa::FixedBlock(128);
 
 using pisa::BlockSize;
@@ -86,9 +86,7 @@ int main(int argc, char const* argv[])
 {
     spdlog::drop("");
     spdlog::set_default_logger(spdlog::stderr_color_mt(""));
-
     tbb::task_scheduler_init init(THREADS);
-
     parse();
     invert();
     compress();
