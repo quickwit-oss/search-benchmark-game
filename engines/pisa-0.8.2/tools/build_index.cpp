@@ -75,7 +75,7 @@ void bmw(pisa::binary_collection const& sizes, pisa::binary_freq_collection cons
 void compress()
 {
     pisa::binary_collection sizes((fmt::format("{}/{}.sizes", IDX_DIR, INV).c_str()));
-    pisa::binary_freq_collection coll(fmt::format("{}/{}.sizes", IDX_DIR, INV).c_str());
+    pisa::binary_freq_collection coll(fmt::format("{}/{}", IDX_DIR, INV).c_str());
     bmw(sizes, coll);
     pisa::compress_index<pisa::block_simdbp_index, Wand>(
         coll,
