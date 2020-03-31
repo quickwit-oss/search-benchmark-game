@@ -70,7 +70,7 @@ enum QueryType {
 fn parse_query(query_str: &str) -> Option<Box<dyn Query<CodecEnum>>> {
     let query_type;
     let terms: Vec<String>;
-    if query_str.starts_with("\"") {
+    if query_str.starts_with("\"") || query_str.starts_with("+\"") {
         query_type = QueryType::Phrase;
         let l = query_str.len() -1;
         terms = query_str[1..l-1].split_whitespace()
