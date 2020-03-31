@@ -16,15 +16,19 @@
 #include <wand_data.hpp>
 #include <wand_data_compressed.hpp>
 
+static std::string const IDX_DIR = "idx";
+static std::string const FWD = "fwd";
+static std::string const INV = "inv";
+
 int main(int argc, char const* argv[])
 {
     using namespace pisa;
     spdlog::drop("");
     spdlog::set_default_logger(spdlog::stderr_color_mt(""));
 
-    std::string terms_file = "/tmp/fwd.termlex";
-    std::string wand_data_filename = "/tmp/inv.bm25.bmw";
-    std::string index_filename = "/tmp/inv.simdbp";
+    std::string terms_file = fmt::format("{}/{}.termlex", IDX_DIR, FWD);
+    std::string wand_data_filename = fmt::format("{}/{}.bm25.bmw", IDX_DIR, INV);
+    std::string index_filename = fmt::format("{}/{}.simdbp", IDX_DIR, INV);
 
     std::string scorer_name = "bm25";
     size_t k = 10;
@@ -68,7 +72,9 @@ int main(int argc, char const* argv[])
         topk_queue topk(k);
         Query query = parse_query_terms(tokens[1], term_processor);
         if (tokens[0] == "COUNT") {
-            if (intersection) {
+            if(query.terms.size() == 1)
+                count = index[query.terms[0]].size();
+            else if (intersection) {
                 and_query and_q;
                 count = and_q(make_cursors(index, query), index.num_docs()).size();
             } else {

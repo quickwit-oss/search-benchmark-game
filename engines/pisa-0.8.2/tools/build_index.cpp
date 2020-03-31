@@ -18,6 +18,7 @@
 
 static std::size_t const THREADS = std::thread::hardware_concurrency();
 static std::size_t const BATCH_SIZE = 10'000;
+static std::string const IDX_DIR = "idx";
 static std::string const FWD = "fwd";
 static std::string const INV = "inv";
 static pisa::BlockSize const BLOCK_SIZE = pisa::FixedBlock(128);
@@ -54,7 +55,7 @@ void parse()
 
 void invert()
 {
-    auto term_lexicon_file = fmt::format("{}.termlex", FWD);
+    auto term_lexicon_file = fmt::format("{}/{}.termlex", IDX_DIR, FWD);
     mio::mmap_source mfile(term_lexicon_file.c_str());
     auto lexicon = pisa::Payload_Vector<>::from(mfile);
     pisa::invert::invert_forward_index(FWD, INV, lexicon.size(), BATCH_SIZE, THREADS);
@@ -63,21 +64,21 @@ void invert()
 void bmw(pisa::binary_collection const& sizes, pisa::binary_freq_collection const& coll)
 {
     Wand wdata(sizes.begin()->begin(), coll.num_docs(), coll, "bm25", BLOCK_SIZE, false, {});
-    pisa::mapper::freeze(wdata, fmt::format("{}.bm25.bmw", INV).c_str());
+    pisa::mapper::freeze(wdata, fmt::format("{}/{}.bm25.bmw", IDX_DIR, INV).c_str());
 }
 
 void compress()
 {
-    pisa::binary_collection sizes((fmt::format("{}.sizes", INV).c_str()));
+    pisa::binary_collection sizes((fmt::format("{}/{}.sizes", IDX_DIR, INV).c_str()));
     pisa::binary_freq_collection coll(INV.c_str());
     bmw(sizes, coll);
     pisa::compress_index<pisa::block_simdbp_index, Wand>(
         coll,
         pisa::global_parameters{},
-        fmt::format("{}.simdbp", INV),
-        true,
+        fmt::format("{}/{}.simdbp", IDX_DIR, INV),
+        false,
         "block_simdbp",
-        fmt::format("{}.bm25.bmw", INV),
+        fmt::format("{}/{}.bm25.bmw", IDX_DIR, INV),
         "bm25",
         true);
 }
