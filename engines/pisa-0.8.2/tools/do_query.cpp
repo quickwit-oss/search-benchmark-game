@@ -57,7 +57,7 @@ int main(int argc, char const* argv[])
         size_t count = 0;
         std::vector<std::string> tokens;
         boost::split(tokens, line, boost::is_any_of("\t"));
-        if (boost::starts_with(tokens[1], "\"")) {
+        if (boost::contains(tokens[1], "\"")) {
             std::cout << "UNSUPPORTED\n";
             continue;
         } else if (boost::starts_with(tokens[1], "+")) {
