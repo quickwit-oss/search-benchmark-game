@@ -8,13 +8,14 @@
 #include <mio/mmap.hpp>
 #include <query/algorithm.hpp>
 #include <query/queries.hpp>
+#include <mappable/mapper.hpp>
 #include <query/term_processor.hpp>
 #include <scorer/scorer.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <topk_queue.hpp>
 #include <wand_data.hpp>
-#include <wand_data_compressed.hpp>
+#include <wand_data_raw.hpp>
 
 static std::string const IDX_DIR = "idx";
 static std::string const FWD = "fwd";
@@ -30,12 +31,11 @@ int main(int argc, char const* argv[])
     std::string wand_data_filename = fmt::format("{}/{}.bm25.bmw", IDX_DIR, INV);
     std::string index_filename = fmt::format("{}/{}.simdbp", IDX_DIR, INV);
 
-    std::string scorer_name = "bm25";
+    std::string scorer_name = "quantized";
     size_t k = 10;
-    bool intersection = false;
 
     auto term_processor = TermProcessor(terms_file, std::nullopt, std::nullopt);
-    using wand_uniform_index_quantized = wand_data<wand_data_compressed<PayloadType::Quantized>>;
+    using wand_uniform_index_quantized = wand_data<wand_data_raw>;
     wand_uniform_index_quantized wdata;
 
     mio::mmap_source md;
@@ -58,6 +58,7 @@ int main(int argc, char const* argv[])
 
     std::string line;
     while (std::getline(std::cin, line)) {
+        bool intersection = false;
         size_t count = 0;
         std::vector<std::string> tokens;
         boost::split(tokens, line, boost::is_any_of("\t"));
@@ -82,7 +83,7 @@ int main(int argc, char const* argv[])
                 count = or_q(make_cursors(index, query), index.num_docs());
             }
         } else if (tokens[0] == "TOP_10") {
-            if (intersection) {
+            if (intersection or query.terms.size() == 1) {
                 ranked_and_query ranked_and_q(topk);
                 ranked_and_q(make_scored_cursors(index, *scorer, query), index.num_docs());
                 topk.finalize();
@@ -95,7 +96,7 @@ int main(int argc, char const* argv[])
                 count = 1;
             }
         } else if (tokens[0] == "TOP_10_COUNT") {
-            if (intersection) {
+            if (intersection or query.terms.size() == 1) {
                 scored_and_query and_q;
                 count = and_q(make_scored_cursors(index, *scorer, query), index.num_docs()).size();
             } else {
