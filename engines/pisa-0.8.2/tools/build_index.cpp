@@ -58,7 +58,12 @@ void invert()
     auto term_lexicon_file = fmt::format("{}/{}.termlex", IDX_DIR, FWD);
     mio::mmap_source mfile(term_lexicon_file.c_str());
     auto lexicon = pisa::Payload_Vector<>::from(mfile);
-    pisa::invert::invert_forward_index(FWD, INV, lexicon.size(), BATCH_SIZE, THREADS);
+    pisa::invert::invert_forward_index(
+        fmt::format("{}/{}", IDX_DIR, FWD),
+        fmt::format("{}/{}", IDX_DIR, INV),
+        lexicon.size(),
+        BATCH_SIZE,
+        THREADS);
 }
 
 void bmw(pisa::binary_collection const& sizes, pisa::binary_freq_collection const& coll)
@@ -70,7 +75,7 @@ void bmw(pisa::binary_collection const& sizes, pisa::binary_freq_collection cons
 void compress()
 {
     pisa::binary_collection sizes((fmt::format("{}/{}.sizes", IDX_DIR, INV).c_str()));
-    pisa::binary_freq_collection coll(INV.c_str());
+    pisa::binary_freq_collection coll(fmt::format("{}/{}.sizes", IDX_DIR, INV).c_str());
     bmw(sizes, coll);
     pisa::compress_index<pisa::block_simdbp_index, Wand>(
         coll,
