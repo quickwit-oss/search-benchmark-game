@@ -34,7 +34,7 @@ void parse()
     pisa::Forward_Index_Builder fwd_builder;
     fwd_builder.build(
         std::cin,
-        FWD,
+        fmt::format("{}/{}", IDX_DIR, FWD),
         [](std::istream& in) -> std::optional<Document_Record> {
             std::string line;
             if (std::getline(in, line) && not line.empty()) {
