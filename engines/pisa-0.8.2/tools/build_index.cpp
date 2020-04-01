@@ -20,7 +20,7 @@
 #include <util/inverted_index_utils.hpp>
 #include <util/progress.hpp>
 
-static std::size_t const THREADS = std::thread::hardware_concurrency();
+static std::size_t const THREADS = 2;
 static std::size_t const BATCH_SIZE = 10'000;
 static std::string const IDX_DIR = "idx";
 static std::string const FWD = "fwd";
