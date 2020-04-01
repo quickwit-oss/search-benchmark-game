@@ -1,3 +1,4 @@
+#include <fstream>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -16,6 +17,9 @@
 #include <wand_data.hpp>
 #include <wand_data_raw.hpp>
 
+#include <cursor/scored_cursor.hpp>
+#include <query/algorithm.hpp>
+#include <query/queries.hpp>
 #include <recursive_graph_bisection.hpp>
 #include <util/inverted_index_utils.hpp>
 #include <util/progress.hpp>
@@ -94,7 +98,8 @@ void compress()
 
 void reorder()
 {
-    pisa::forward_index fwd = pisa::forward_index::from_inverted_index(fmt::format("{}/{}", IDX_DIR, INV), 0, false);
+    pisa::forward_index fwd =
+        pisa::forward_index::from_inverted_index(fmt::format("{}/{}", IDX_DIR, INV), 0, false);
     std::vector<uint32_t> documents(fwd.size());
     std::iota(documents.begin(), documents.end(), 0U);
     std::vector<double> gains(fwd.size(), 0.0);
@@ -108,9 +113,56 @@ void reorder()
     auto mapping = pisa::get_mapping(documents);
     fwd.clear();
     documents.clear();
-    pisa::reorder_inverted_index(fmt::format("{}/{}", IDX_DIR, INV), fmt::format("{}/{}.bp", IDX_DIR, INV), mapping);
+    pisa::reorder_inverted_index(
+        fmt::format("{}/{}", IDX_DIR, INV), fmt::format("{}/{}.bp", IDX_DIR, INV), mapping);
 }
 
+void compute_thresholds()
+{
+    using namespace pisa;
+    size_t k = 10;
+
+    using wand_uniform_index_quantized = wand_data<wand_data_raw>;
+    wand_uniform_index_quantized wdata;
+    mio::mmap_source md;
+    std::error_code error;
+    md.map(fmt::format("{}/{}.bm25.bmw", IDX_DIR, INV), error);
+    if (error) {
+        std::cerr << "error mapping file: " << error.message() << ", exiting..." << std::endl;
+        throw std::runtime_error("Error opening file");
+    }
+    mapper::map(wdata, md, mapper::map_flags::warmup);
+
+    using IndexType = block_simdbp_index;
+
+    IndexType index;
+    mio::mmap_source m(fmt::format("{}/{}.simdbp", IDX_DIR, INV).c_str());
+    mapper::map(index, m);
+
+    auto scorer = scorer::from_name("quantized", wdata);
+
+    auto term_lexicon_file = fmt::format("{}/{}.termlex", IDX_DIR, FWD);
+    mio::mmap_source mfile(term_lexicon_file.c_str());
+    auto lexicon_size = pisa::Payload_Vector<>::from(mfile).size();
+
+    std::ofstream thresholds_file(fmt::format("{}/{}.thresholds", IDX_DIR, FWD));
+
+    for (size_t term = 0; term < lexicon_size; ++term) {
+        Query query;
+        query.terms.push_back(term);
+        topk_queue topk(k);
+        ranked_and_query ranked_and_q(topk);
+        ranked_and_q(make_scored_cursors(index, *scorer, query), index.num_docs());
+        topk.finalize();
+        auto results = topk.topk();
+        topk.clear();
+        float threshold = 0.0;
+        if (results.size() == k) {
+            threshold = results.back().first;
+        }
+        thresholds_file << threshold << '\n';
+    }
+}
 
 int main(int argc, char const* argv[])
 {
@@ -121,4 +173,5 @@ int main(int argc, char const* argv[])
     invert();
     reorder();
     compress();
+    compute_thresholds();
 }

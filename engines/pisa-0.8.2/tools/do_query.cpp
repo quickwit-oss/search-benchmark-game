@@ -56,6 +56,15 @@ int main(int argc, char const* argv[])
 
     auto scorer = scorer::from_name(scorer_name, wdata);
 
+
+    std::vector<float> thresholds;
+    std::ifstream tin(fmt::format("{}/{}.thresholds", IDX_DIR, FWD));
+    std::string t;
+    while (std::getline(tin, t)) {
+        thresholds.push_back(std::stof(t));
+    }
+
+
     std::string line;
     while (std::getline(std::cin, line)) {
         bool intersection = false;
@@ -70,7 +79,7 @@ int main(int argc, char const* argv[])
             boost::replace_all(tokens[1], "+", "");
         }
 
-        topk_queue topk(k);
+
         Query query = parse_query_terms(tokens[1], term_processor);
         if (tokens[0] == "COUNT") {
             if(query.terms.size() == 1)
@@ -83,12 +92,18 @@ int main(int argc, char const* argv[])
                 count = or_q(make_cursors(index, query), index.num_docs());
             }
         } else if (tokens[0] == "TOP_10") {
+            topk_queue topk(k);
             if (intersection or query.terms.size() == 1) {
                 ranked_and_query ranked_and_q(topk);
                 ranked_and_q(make_scored_cursors(index, *scorer, query), index.num_docs());
                 topk.finalize();
                 count = 1;
             } else {
+                float threshold = 0;
+                for (auto &&term : query.terms){
+                    threshold = std::max(threshold, thresholds[term]);
+                }
+                topk.set_threshold(threshold);
                 block_max_wand_query block_max_wand_q(topk);
                 block_max_wand_q(
                     make_block_max_scored_cursors(index, wdata, *scorer, query), index.num_docs());
