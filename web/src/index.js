@@ -5,7 +5,7 @@ import './style.scss'
 import * as serviceWorker from './serviceWorker';
 
 function formatPercentVariation(p) {
-  if (p != undefined) {
+  if (p !== undefined) {
     return "+" + (p * 100).toFixed(1) + " %";
   } else {
     return "";
@@ -13,7 +13,7 @@ function formatPercentVariation(p) {
 }
 
 function numberWithCommas(x) {
-  var x = x.toString();
+  x = x.toString();
   let pattern = /(-?\d+)(\d{3})/
   while (pattern.test(x)) {
     x = x.replace(pattern, "$1,$2");
@@ -33,7 +33,7 @@ function stats(timings) {
 }
 
 function aggregate(query) {
-  if (query.duration.length == 0) {
+  if (query.duration.length === 0) {
     return { query: query.query, className: "unsupported", unsupported: true }
   }
   var res = stats(query.duration);
@@ -59,7 +59,7 @@ class Benchmark extends React.Component {
 
   handleChangeTag(evt) {
     var tag = evt.target.value;
-    if (tag == "ALL") {
+    if (tag === "ALL") {
       this.setState({ "tag": null });
     } else {
       this.setState({ "tag": tag });
@@ -68,15 +68,11 @@ class Benchmark extends React.Component {
 
   filterQueries(queries) {
     let tag = this.state.tag;
-    if (tag != undefined) {
+    if (tag !== undefined) {
       return queries.filter(query => query.tags.indexOf(tag) >= 0);
     } else {
       return queries;
     }
-  }
-
-  generateDataView() {
-    return {};
   }
 
   generateDataView() {
@@ -102,9 +98,9 @@ class Benchmark extends React.Component {
         total = (total / engine_queries.length) | 0;
       }
       engines[engine] = total;
-      for (var query of engine_queries) {
+      for (let query of engine_queries) {
         var query_data = {};
-        if (queries[query.query] != undefined) {
+        if (queries[query.query] !== undefined) {
           query_data = queries[query.query];
         }
         query_data[engine] = query
@@ -112,13 +108,13 @@ class Benchmark extends React.Component {
       }
     }
 
-    for (var query in queries) {
-      var query_data = queries[query];
+    for (let query in queries) {
+      let query_data = queries[query];
       var min_engine = null;
       var min_microsecs = 0;
       var max_engine = null;
       var max_microsecs = 0;
-      for (var engine in query_data) {
+      for (let engine in query_data) {
         var engine_data = query_data[engine];
         if (engine_data.unsupported)
           continue;
@@ -131,10 +127,10 @@ class Benchmark extends React.Component {
           max_microsecs = engine_data.min;
         }
       }
-      for (var engine in query_data) {
-        var engine_data = query_data[engine];
+      for (let engine in query_data) {
+        let engine_data = query_data[engine];
         if (engine_data.unsupported) continue;
-        if (engine != min_engine) {
+        if (engine !== min_engine) {
           engine_data.variation = (engine_data.min - min_microsecs) / min_microsecs;
         }
       }
@@ -180,7 +176,7 @@ class Benchmark extends React.Component {
               Object.entries(data_view.engines).map(kv => {
                 var engine = kv[0];
                 var engine_stats = kv[1];
-                if (engine_stats != undefined) {
+                if (engine_stats !== undefined) {
                   return <td key={"result-" + engine}>
                     {numberWithCommas(engine_stats)} μs
                 </td>;
@@ -227,7 +223,6 @@ $(function () {
     var modes = [];
     var engines = [];
     var tags_set = new Set();
-    var tags = [];
     for (var mode in data) {
       modes.push(mode);
     }
