@@ -36,5 +36,5 @@ compile:
 
 serve:
 	@echo "--- Serving results ---"
-	@cp results.json web/output/results.json
-	@cd web/output && python3 -m http.server $(PORT)
+	@cp results.json web/build/results.json
+	@cd web/build && python3 -m http.server $(PORT)
