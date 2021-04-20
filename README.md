@@ -86,13 +86,18 @@ git clone git@github.com:tantivy-search/search-benchmark-game.git
 
 ## Running
 
-The corpus used for this benchmark needs to be download and decompressed separately.
-You can download it from [DropBox](https://www.dropbox.com/s/wwnfnu441w1ec9p/wiki-articles.json.bz2?dl=0).
-It can then be decompressed using `bunzip2`.
+Checkout the [Makefile](Makefile) for all available commands. You can adjust the `ENGINES` parameter for a different set of engines.
 
-  bunzip2 wiki-articles.json.bz2
+Run `make corpus` to download and unzip the corpus used in the benchmark.
+```
+make corpus
+```
 
-Then make sure to copy the `wiki-articles.json` file at the root of `search-index-benchmark`.
+Run `make index` to create the indices for the engines.
+
+```
+make index
+```
 
 Run `make bench` to build the different project and run the benches.
 This command may take more than 30mn.
