@@ -1,0 +1,19 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'java'
+}
+
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.apache.lucene', name: 'lucene-core', version: '8.10.1'
+    implementation group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '8.10.1'
+    implementation group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.10.1'
+    implementation group: 'com.eclipsesource.minimal-json', name: 'minimal-json', version: '0.9.5'
+}

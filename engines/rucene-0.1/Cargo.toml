@@ -5,7 +5,7 @@ authors = ["Paul Masurel <paul.masurel@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-rucene = "0.1"
+rucene = { git = "https://github.com/zhihu/rucene", rev="5b55f842" }
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"

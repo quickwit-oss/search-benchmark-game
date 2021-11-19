@@ -107,7 +107,9 @@ fn parse_query(query_str: &str) -> Option<Box<dyn Query<CodecEnum>>> {
                     })
                     .collect(),
                 vec![],
-                vec![]
+                vec![],
+                vec![],
+                0i32
             ).ok();
         }
         QueryType::Or => {
@@ -119,7 +121,9 @@ fn parse_query(query_str: &str) -> Option<Box<dyn Query<CodecEnum>>> {
                         term_query
                     })
                     .collect(),
-                vec![]
+                vec![],
+                vec![],
+                0i32,
             ).ok();
         }
         QueryType::Phrase => {
@@ -135,7 +139,7 @@ fn main_inner(index_dir: &Path) -> rucene::error::Result<()> {
     // create index writer
     let directory = Arc::new(FSDirectory::with_path(&index_dir)?);
     let reader: StandardDirectoryReader<FSDirectory, CodecEnum,  SerialMergeScheduler, TieredMergePolicy> = StandardDirectoryReader::open(directory)?;
-    let searcher = DefaultIndexSearcher::new(Arc::new(reader), None, None);
+    let searcher = DefaultIndexSearcher::new(Arc::new(reader), None);
 
     let stdin = std::io::stdin();
     for line_res in stdin.lock().lines() {
@@ -149,7 +153,7 @@ fn main_inner(index_dir: &Path) -> rucene::error::Result<()> {
             println!("UNSUPPORTED");
             continue;
         }
-        let query = query_opt.unwrap(); 
+        let query = query_opt.unwrap();
         let count;
         match command {
             "COUNT" => {

@@ -1,9 +1,20 @@
+help:
+	@grep '^[^#[:space:]].*:' Makefile
+
 clean:
 	@echo "--- Cleaning PISA 0.8.2 ---"
 	@rm -fr idx
 	@rm -fr build
+	@rm -fr CMakeCache.txt
+	@rm -fr CMakeFiles
 
-compile: build/bin/build_index build/bin/do_query
+
+compile-within-container: build/bin/build_index build/bin/do_query
+	echo "compiling"
+
+compile:
+	docker build -t pisa-builder .
+	docker run --rm -it -v "$(shell pwd)":/home/pisa/src/ pisa-builder
 
 index: idx
 

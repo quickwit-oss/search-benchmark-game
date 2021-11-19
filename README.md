@@ -57,7 +57,6 @@ Out of 5 runs, we only retain the best score, so Garbage Collection likely does 
 ### Lucene
 
 - Query cache is disabled.
-- Maxscore is not yet used in Top 10. It should give a nice boost once Lucene 8 is released.
 - GC should not influence the results as we pick the best out of 5 runs.
 - JVM used was openjdk 10.0.1 2018-04-17
 
