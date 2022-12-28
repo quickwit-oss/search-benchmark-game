@@ -25,9 +25,11 @@ public class BuildIndex {
                 final Document document = new Document();
 
                 StoredField idField = new StoredField("id",     "");
+                IntPoint idNumField = new IntPoint("id_num",     4);
                 TextField textField = new TextField("text", "", Field.Store.NO);
 
                 document.add(idField);
+                document.add(idNumField);
                 document.add(textField);
 
                 String line;
@@ -37,8 +39,10 @@ public class BuildIndex {
                     }
                     final JsonObject parsed_doc = Json.parse(line).asObject();
                     final String id = parsed_doc.get("id").asString();
+                    final int id_num = parsed_doc.get("id_num").asInt();
                     final String text = parsed_doc.get("text").asString();
                     idField.setStringValue(id);
+                    idNumField.setIntValue(id_num);
                     textField.setStringValue(text);
                     writer.addDocument(document);
                 }

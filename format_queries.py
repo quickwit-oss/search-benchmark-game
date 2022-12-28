@@ -33,14 +33,14 @@ def generate_queries(words):
         }
 
 for line in fileinput.input():
-    (count, query) = PTN.split(line.decode("utf-8").strip(), 1)
+    (count, query) = PTN.split(line.strip(), 1)
     count = int(count)
     if not LETTERS_ONLY.match(query):
         continue
     words = PTN.split(query)
     for q in generate_queries(words):
         try:
-            qdoc = json.dumps(q).encode("utf-8")
-            print qdoc
+            qdoc = json.dumps(q)
+            print(qdoc)
         except:
             pass

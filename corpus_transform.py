@@ -16,9 +16,12 @@ for line in fileinput.input():
 
     if doc["url"] == "":
         continue
+    if len(doc["url"].split("curid=",1)) == 1:
+        continue
 
     doc_transformed = {
         "id": doc["url"],
+        "id_num": int(doc["url"].split("curid=",1)[1]),
         "text": transform(doc["body"])
     }
 

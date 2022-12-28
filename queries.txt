@@ -897,3 +897,9 @@
 {"query": "\"laborers international union of north america\"", "tags": ["phrase", "phrase:num_tokens_>3"]}
 {"query": "laborers international union of north america", "tags": ["union", "global", "union:num_tokens_>3"]}
 {"query": "+\"the who\" +uk", "tags": ["two-phase-critic"]}
+{"query": "id_num:[48694410 TO 48694420] +griffith +observatory", "tags": ["range", "range_selective"]}
+{"query": "id_num:[48694410 TO 48694420] +the", "tags": ["range", "range_selective"]}
+{"query": "id_num:[48694410 TO 48694420] niceville high school", "tags": ["range", "range_selective"]}
+{"query": "id_num:[0 TO 10000000] +griffith +observatory", "tags": ["range", "range_unselective"]}
+{"query": "id_num:[0 TO 10000000] +the", "tags": ["range", "range_unselective"]}
+{"query": "id_num:[0 TO 10000000] niceville high school", "tags": ["range", "range_unselective"]}
