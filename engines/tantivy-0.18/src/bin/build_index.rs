@@ -2,7 +2,7 @@ use futures::executor::block_on;
 use std::env;
 use std::io::BufRead;
 use std::path::Path;
-use tantivy::schema::{Schema, STORED, TEXT};
+use tantivy::schema::{Schema, FAST, INDEXED, STORED, TEXT};
 use tantivy::Index;
 
 fn main() {
@@ -13,6 +13,7 @@ fn main() {
 fn create_schema() -> Schema {
     let mut schema_builder = Schema::builder();
     schema_builder.add_text_field("id", STORED);
+    schema_builder.add_u64_field("id_num", FAST | INDEXED);
     schema_builder.add_text_field("text", TEXT);
     schema_builder.build()
 }

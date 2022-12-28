@@ -10,8 +10,9 @@ COMMANDS = os.environ['COMMANDS'].split(' ')
 
 class SearchClient:
 
-    def __init__(self, engine):
+    def __init__(self, engine, unsupported_queries):
         self.engine = engine
+        self.unsupported_queries = unsupported_queries
         dirname = os.path.split(os.path.abspath(__file__))[0]
         dirname = path.dirname(dirname)
         dirname = path.join(dirname, "engines")
@@ -23,6 +24,8 @@ class SearchClient:
             stdin=subprocess.PIPE)
 
     def query(self, query, command):
+        if query in unsupported_queries:
+            return None
         query_line = "%s\t%s\n" % (command, query)
         self.process.stdin.write(query_line.encode("utf-8"))
         self.process.stdin.flush()
@@ -57,19 +60,37 @@ def read_queries(query_path):
 WARMUP_ITER = 1
 NUM_ITER = 3
 
+def filter_non_range_queries(queries):
+  return [query for query in queries if 'range' not in query.tags]
+
+def get_range_queries(queries):
+    range_queries = set()
+    for query in queries:
+        if 'range' in query.tags:
+            range_queries.add(query.query)
+    return range_queries
 
 if __name__ == "__main__":
     import sys
     random.seed(2)
     query_path = sys.argv[1]
     engines = sys.argv[2:]
+    range_query_enabled_engines = os.environ['RANGE_QUERY_ENABLED_ENGINES'].split(" ")
+    range_query_enabled_engines  = [engine.strip() for engine in range_query_enabled_engines]
     queries = list(read_queries(query_path))
+    # non_range_queries = filter_non_range_queries(queries)
+    range_queries = get_range_queries(queries)
     results = {}
     for command in COMMANDS:
         results_commands = {}
         for engine in engines:
             engine_results = []
             query_idx = {}
+            if engine in range_query_enabled_engines:
+                unsupported_queries = set()
+            else:
+                unsupported_queries = range_queries
+
             for query in queries:
                 query_result = {
                     "query": query.query,
@@ -81,7 +102,7 @@ if __name__ == "__main__":
                 engine_results.append(query_result)
             print("======================")
             print("BENCHMARKING %s %s" % (engine, command))
-            search_client = SearchClient(engine)
+            search_client = SearchClient(engine, unsupported_queries)
             print("--- Warming up ...")
             queries_shuffled = list(queries[:])
             random.seed(2)

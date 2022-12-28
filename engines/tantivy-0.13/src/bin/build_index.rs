@@ -1,9 +1,9 @@
-use tantivy::schema::{Schema, STORED, TEXT};
-use tantivy::Index;
+use futures::executor::block_on;
 use std::env;
 use std::io::BufRead;
 use std::path::Path;
-use futures::executor::block_on;
+use tantivy::schema::{Schema, STORED, TEXT};
+use tantivy::Index;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -11,10 +11,11 @@ fn main() {
 }
 
 fn create_schema() -> Schema {
-  let mut schema_builder = Schema::builder();
-  schema_builder.add_text_field("id", STORED);
-  schema_builder.add_text_field("text", TEXT);
-  schema_builder.build()
+    let mut schema_builder = Schema::builder();
+    schema_builder.add_text_field("id", STORED);
+    schema_builder.add_u64_field("id_num", FAST | INDEXED);
+    schema_builder.add_text_field("text", TEXT);
+    schema_builder.build()
 }
 
 fn main_inner(output_dir: &Path) -> tantivy::Result<()> {
@@ -25,7 +26,9 @@ fn main_inner(output_dir: &Path) -> tantivy::Result<()> {
 
     let mut i = 0;
     {
-        let mut index_writer = index.writer_with_num_threads(4, 2_000_000_000).expect("failed to create index writer");
+        let mut index_writer = index
+            .writer_with_num_threads(4, 2_000_000_000)
+            .expect("failed to create index writer");
         let stdin = std::io::stdin();
 
         for line in stdin.lock().lines() {
@@ -44,9 +47,11 @@ fn main_inner(output_dir: &Path) -> tantivy::Result<()> {
         index_writer.commit()?;
         index_writer.wait_merging_threads()?;
     }
-        let segment_ids = index.searchable_segment_ids()?;
-        let mut index_writer = index.writer(1_500_000_000).expect("failed to create index writer");
-        block_on(index_writer.merge(&segment_ids))?;
-        block_on(index_writer.garbage_collect_files())?;
+    let segment_ids = index.searchable_segment_ids()?;
+    let mut index_writer = index
+        .writer(1_500_000_000)
+        .expect("failed to create index writer");
+    block_on(index_writer.merge(&segment_ids))?;
+    block_on(index_writer.garbage_collect_files())?;
     Ok(())
 }
