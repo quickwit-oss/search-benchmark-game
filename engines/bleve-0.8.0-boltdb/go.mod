@@ -1,4 +1,4 @@
-module github.com/mosuka/blevesample
+module github.com/quickwit-oss/blevesample
 
 go 1.13
 

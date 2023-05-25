@@ -1,4 +1,4 @@
-module github.com/k-yomo/search-benchmark-game/engines/bluge-0.1.9
+module github.com/quickwit-oss/search-benchmark-game/engines/bluge-0.1.9
 
 go 1.13
 

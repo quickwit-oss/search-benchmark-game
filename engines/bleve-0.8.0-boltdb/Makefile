@@ -22,7 +22,7 @@ endif
 
 init:
 	@echo "--- Initializing Bleve 0.8.0 boltdb ---"
-	@$(GO) mod init github.com/mosuka/search-benchmark-game
+	@$(GO) mod init github.com/quickwit-oss/search-benchmark-game
 
 format:
 	@echo "--- Formatting code ---"
