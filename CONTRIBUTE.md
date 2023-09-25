@@ -49,6 +49,9 @@ Engines are recommended to follow the below guidelines:
  - Hits must be ranked according to the
    [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) ranking function with
    standard parameters `k1`=0.9 and `b`=0.4.
+ - Phrase queries must be evaluated using indexed positions. They must not take
+   advantage of indexing phrases at indexing time (e.g. Lucene's
+   ShingleFilter).
  - Result caches must be disabled.
 
 # Adding tests
