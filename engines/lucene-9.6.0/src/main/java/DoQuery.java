@@ -5,6 +5,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ public class DoQuery {
         try (IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir))) {
             final IndexSearcher searcher = new IndexSearcher(reader);
             searcher.setQueryCache(null);
+            searcher.setSimilarity(new BM25Similarity(0.9f, 0.4f));
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))) {
                 final QueryParser queryParser = new QueryParser("text", new StandardAnalyzer(CharArraySet.EMPTY_SET));
                 String line;

@@ -29,8 +29,8 @@ The corpus used is the English wikipedia. Stemming is disabled. Queries have bee
  from the [AOL query dataset](https://en.wikipedia.org/wiki/AOL_search_data_leak)
  (but do not contain any personal information).
 
-Out of a random sample of query, we filtered queries that had at least two terms and yield at least 1 hit when searches as
-a phrase query.
+Out of a random sample of query, we filtered queries that had at least two terms and yield at least 1 hit when searched
+as a phrase query.
 
 For each of these query, we then run them as :
 - `intersection`
@@ -49,15 +49,14 @@ All tests are run once in order to make sure that
 - Java's JIT already kicked in.
 
 Test are run in a single thread.
-Out of 5 runs, we only retain the best score, so Garbage Collection likely does not matter.
-
+Out of 10 runs, we only retain the best score, so Garbage Collection likely does not matter.
 
 ## Engine specific detail
 
 ### Lucene
 
 - Query cache is disabled.
-- GC should not influence the results as we pick the best out of 5 runs.
+- GC should not influence the results as we pick the best out of 10 runs.
 - JVM used was openjdk 10.0.1 2018-04-17
 
 ### Tantivy
