@@ -32,7 +32,6 @@ int main(int argc, char const* argv[])
     std::string index_filename = fmt::format("{}/{}.simdbp", IDX_DIR, INV);
 
     std::string scorer_name = "quantized";
-    size_t k = 10;
 
     auto term_processor = TermProcessor(terms_file, std::nullopt, std::nullopt);
     using wand_uniform_index_quantized = wand_data<wand_data_raw>;
@@ -91,7 +90,17 @@ int main(int argc, char const* argv[])
                 or_query<false> or_q;
                 count = or_q(make_cursors(index, query), index.num_docs());
             }
-        } else if (tokens[0] == "TOP_10") {
+        } else if (tokens[0] == "TOP_10" || tokens[0] == "TOP_100" || tokens[0] == "TOP_1000") {
+            size_t k;
+            if (tokens[0] == "TOP_10") {
+                k = 10;
+            } else if (tokens[0] == "TOP_100") {
+                k = 100;
+            } else if (tokens[0] == "TOP_1000") {
+                k = 1000;
+            } else {
+                throw std::runtime_error(fmt::format("Can't compute k for {}", tokens[0]));
+            }
             topk_queue topk(k);
             if (intersection or query.terms.size() == 1) {
                 ranked_and_query ranked_and_q(topk);
@@ -110,7 +119,7 @@ int main(int argc, char const* argv[])
                 topk.finalize();
                 count = 1;
             }
-        } else if (tokens[0] == "TOP_10_COUNT") {
+        } else if (tokens[0] == "TOP_10_COUNT" || tokens[0] == "TOP_100_COUNT" || tokens[0] == "TOP_1000_COUNT") {
             if (intersection or query.terms.size() == 1) {
                 scored_and_query and_q;
                 count = and_q(make_scored_cursors(index, *scorer, query), index.num_docs()).size();
