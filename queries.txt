@@ -897,3 +897,6 @@
 {"query": "\"laborers international union of north america\"", "tags": ["phrase", "phrase:num_tokens_>3"]}
 {"query": "laborers international union of north america", "tags": ["union", "global", "union:num_tokens_>3"]}
 {"query": "+\"the who\" +uk", "tags": ["two-phase-critic"]}
+{"query": "+to +be +or +not +to +be", "tags": ["intersection", "intersection:num_tokens_>3"]}
+{"query": "\"to be or not to be\"", "tags": ["phrase", "phrase:num_tokens_>3"]}
+{"query": "to be or not to be", "tags": ["union", "union:num_tokens_>3"]}
