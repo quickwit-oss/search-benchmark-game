@@ -1,6 +1,6 @@
 # Adding another engine
 
-Currently only tantivy and lucene are supported, but you can add another search
+Currently only Tantivy and Lucene are supported, but you can add another search
 engine by creating a directory in the engines directory and add a `Makefile`
 implementing the following commands :
 
@@ -20,7 +20,7 @@ Stemming should be disabled. Tokenization should be something reasonably close t
 
 Starts a program that will get `tests` from stdin, and output
 a result hit count as fast as possible. *If this is not your language's default,
-be sure to flush stdout after writing your answer".
+be sure to flush stdout after writing your answer*.
 
 The tests consist in a command followed by a query.
 
@@ -39,6 +39,20 @@ Queries are expressed in the Lucene query language.
 
 If a command is not supported, just print to stdout "UNSUPPORTED".
 
+# Recommendations for new engines
+
+Engines are recommended to follow the below guidelines:
+ - Indexing is not measured and may be multi-threaded.
+ - Engines may optimize for read-only access, e.g. by merging multiple segments
+   down to a single one or performing document reordering.
+ - Search operations must run in a single thread.
+ - Hits must be ranked according to the
+   [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) ranking function with
+   standard parameters `k1`=0.9 and `b`=0.4.
+ - Phrase queries must be evaluated using indexed positions. They must not take
+   advantage of indexing phrases at indexing time (e.g. Lucene's
+   ShingleFilter).
+ - Result caches must be disabled.
 
 # Adding tests
 
