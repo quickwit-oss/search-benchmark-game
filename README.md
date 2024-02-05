@@ -49,8 +49,18 @@ All tests are run once in order to make sure that
 - Java's JIT already kicked in.
 
 Test are run in a single thread.
-Out of 5 runs, we only retain the best score, so Garbage Collection likely does not matter.
+Out of 10 runs, we only retain the best score, so Garbage Collection likely does not matter.
 
+### Benchmark environment
+
+The results file that is included in this repository was generated using the following benchmark
+environment:
+ - AWS c7i.2xlarge instance running on us-east-1
+ - Processor Intel(R) Xeon(R) Platinum 8488C
+ - Amazon Linux 2023
+ - Kernel `6.1.72-96.166.amzn2023.x86_64`
+ - Rust 1.75
+ - Adoptium JDK `OpenJDK21U-jdk_x64_linux_hotspot_21.0.2_13`
 
 ## Engine specific detail
 
@@ -58,7 +68,6 @@ Out of 5 runs, we only retain the best score, so Garbage Collection likely does 
 
 - Query cache is disabled.
 - GC should not influence the results as we pick the best out of 5 runs.
-- JVM used was openjdk 10.0.1 2018-04-17
 - The `-bp` variant implements document reordering via the bipartite graph partitioning algorithm, also called recursive graph bisection.
 
 ### Tantivy
