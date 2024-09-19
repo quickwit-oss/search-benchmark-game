@@ -42,13 +42,33 @@ function aggregate(query) {
   return res;
 }
 
+function stats_row(engines, name, className, stat) {
+  return <tr className={className + "-row"}>
+            <td>{name}</td>
+            {
+              Object.entries(engines).map(kv => {
+                var engine = kv[0];
+                var engine_stats = kv[1];
+                if (engine_stats !== undefined) {
+                  return <td key={"result-" + engine}>
+                    {numberWithCommas(engine_stats[stat])} μs
+                </td>;
+                } else {
+                  return <td key={"result-" + engine}>
+                    Some Unsupported Queries
+                </td>;
+                }
+              })
+            }
+          </tr>;
+}
 
 class Benchmark extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      mode: "TOP_10",
+      mode: "TOP_100",
       tag: null
     };
   }
@@ -60,7 +80,7 @@ class Benchmark extends React.Component {
   handleChangeTag(evt) {
     var tag = evt.target.value;
     if (tag === "ALL") {
-      this.setState({ "tag": null });
+      this.setState({ "tag": undefined });
     } else {
       this.setState({ "tag": tag });
     }
@@ -84,20 +104,34 @@ class Benchmark extends React.Component {
       engine_queries = Array.from(this.filterQueries(engine_queries));
       engine_queries = engine_queries.map(aggregate);
       var total = 0
+      var p50 = 0
+      var p90 = 0
+      var p99 = 0
       var unsupported = false
+      var all_latencies = []
       for (var query of engine_queries) {
         if (query.unsupported) {
           unsupported = true;
         } else {
           total += query.min;
+          all_latencies.push(query.min);
         }
       }
       if (unsupported) {
         total = undefined;
+        p50 = undefined;
+        p90 = undefined;
+        p99 = undefined;
       } else {
         total = (total / engine_queries.length) | 0;
+        if (all_latencies.length !== 0) {
+          all_latencies.sort(function(a, b) { return a - b; });
+          p50 = all_latencies[Math.round((all_latencies.length - 1) * 0.5)];
+          p90 = all_latencies[Math.round((all_latencies.length - 1) * 0.9)];
+          p99 = all_latencies[Math.round((all_latencies.length - 1) * 0.99)];
+        }
       }
-      engines[engine] = total;
+      engines[engine] = unsupported ? undefined : { "average": total, "p50": p50, "p90": p90, "p99": p99 };
       for (let query of engine_queries) {
         var query_data = {};
         if (queries[query.query] !== undefined) {
@@ -170,24 +204,10 @@ class Benchmark extends React.Component {
           </tr>
         </thead>
         <tbody>
-          <tr className="average-row">
-            <td>AVERAGE</td>
-            {
-              Object.entries(data_view.engines).map(kv => {
-                var engine = kv[0];
-                var engine_stats = kv[1];
-                if (engine_stats !== undefined) {
-                  return <td key={"result-" + engine}>
-                    {numberWithCommas(engine_stats)} μs
-                </td>;
-                } else {
-                  return <td key={"result-" + engine}>
-                    Some Unsupported Queries
-                </td>;
-                }
-              })
-            }
-          </tr>
+          { stats_row(data_view.engines, "AVERAGE", "average", "average") }
+          { stats_row(data_view.engines, "P50", "percentile", "p50") }
+          { stats_row(data_view.engines, "P90", "percentile", "p90") }
+          { stats_row(data_view.engines, "P99", "percentile", "p99") }
           {
             Object.entries(data_view.queries).map(kv => {
               var query = kv[0];
