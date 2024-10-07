@@ -49,6 +49,11 @@ td:last-child {
   border-bottom: solid 8px white
 }
 
+td.details {
+  text-align: left;
+  font-size: 12px;
+}
+
 td.data {
   padding: 1.2rem 1.5rem 0.5rem 1.5rem;
 }

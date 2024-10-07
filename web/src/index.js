@@ -98,7 +98,8 @@ class Benchmark extends React.Component {
   generateDataView() {
     var engines = {}
     var queries = {}
-    var mode_data = this.props.data[this.state.mode];
+    var details = this.props.data.details;
+    var mode_data = this.props.data.results[this.state.mode];
     for (var engine in mode_data) {
       var engine_queries = mode_data[engine];
       engine_queries = Array.from(this.filterQueries(engine_queries));
@@ -174,7 +175,7 @@ class Benchmark extends React.Component {
         query_data[max_engine].className = "slowest";
       }
     }
-    return { engines, queries };
+    return { engines, queries, details };
   }
 
   render() {
@@ -204,6 +205,20 @@ class Benchmark extends React.Component {
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td>Notable implementation details</td>
+            {
+              Object.keys(data_view.engines).map(engine => {
+                return <td class="details"><ul>
+                {
+                  data_view.details[engine].map(detail => {
+                    return <li>{detail}</li>;
+                  })
+                }
+                </ul></td>
+              })
+            }
+          </tr>
           { stats_row(data_view.engines, "AVERAGE", "average", "average") }
           { stats_row(data_view.engines, "P50", "percentile", "p50") }
           { stats_row(data_view.engines, "P90", "percentile", "p90") }
@@ -243,13 +258,13 @@ $(function () {
     var modes = [];
     var engines = [];
     var tags_set = new Set();
-    for (var mode in data) {
+    for (var mode in data.results) {
       modes.push(mode);
     }
-    for (var engine in data[modes[0]]) {
+    for (var engine in data.results[modes[0]]) {
       engines.push(engine);
     }
-    for (var query of data[modes[0]][engines[0]]) {
+    for (var query of data.results[modes[0]][engines[0]]) {
       for (var tag of query.tags) {
         tags_set.add(tag);
       }
