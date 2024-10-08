@@ -2,7 +2,7 @@
   "Written in Rust.",
   "Index is read from disk via mmap.",
   "Doc-at-a-time.",
-  "Doc deltas, frequencies and positions are encoded using PFOR-delta and blocks of size 128.",
+  "Doc deltas, frequencies and positions are encoded using FOR-delta and blocks of size 128.",
   "Single level of skip data inlined into postings, every 128 docs.",
   "Impacts are inlined into skip data.",
   "Implements block-max WAND / block-max AND for top-k commands.",
