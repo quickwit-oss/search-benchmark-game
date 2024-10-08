@@ -63,6 +63,16 @@ function stats_row(engines, name, className, stat) {
           </tr>;
 }
 
+function details_list(engine_details) {
+  return <ul className="details">
+    {
+      engine_details.map(detail => {
+        return <li>{detail}</li>;
+      })
+    }
+    </ul>;
+}
+
 class Benchmark extends React.Component {
 
   constructor(props) {
@@ -200,25 +210,11 @@ class Benchmark extends React.Component {
           <tr>
             <th>Query</th>
             {
-              Object.keys(data_view.engines).map((engine) => <th key={"col-" + engine}>{engine}</th>)
+              Object.keys(data_view.engines).map((engine) => <th key={"col-" + engine}><details><summary>{engine}</summary>{ details_list(data_view.details[engine]) }</details></th>)
             }
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Notable implementation details</td>
-            {
-              Object.keys(data_view.engines).map(engine => {
-                return <td class="details"><ul>
-                {
-                  data_view.details[engine].map(detail => {
-                    return <li>{detail}</li>;
-                  })
-                }
-                </ul></td>
-              })
-            }
-          </tr>
           { stats_row(data_view.engines, "AVERAGE", "average", "average") }
           { stats_row(data_view.engines, "P50", "percentile", "p50") }
           { stats_row(data_view.engines, "P90", "percentile", "p90") }
