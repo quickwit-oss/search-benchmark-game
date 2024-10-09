@@ -25,7 +25,7 @@ body {
 td {
     border: solid 1px white;
     text-align: right;
-    min-width: 100px;
+    min-width: 120px;
 }
 
 td:last-child {
@@ -47,6 +47,13 @@ td:last-child {
   background-color: grey;
   color: white;
   border-bottom: solid 8px white
+}
+
+ul.details {
+  text-align: left;
+  font-size: 12px;
+  font-weight: lighter;
+  padding-left: 10px;
 }
 
 td.data {

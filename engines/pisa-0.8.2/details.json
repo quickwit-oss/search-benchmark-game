@@ -1,0 +1,9 @@
+[
+  "Written in C++.",
+  "Index is read from disk via mmap.",
+  "Doc-at-a-time.",
+  "Doc deltas, frequencies and positions are encoded using Lemire's FastPFOR library with blocks of size 128.",
+  "Implements block-max WAND / block-max AND for top-k commands.",
+   "Impacts are stored directly, and require a single segment.",
+  "Doc IDs are reordered using recursive graph bisection."
+]

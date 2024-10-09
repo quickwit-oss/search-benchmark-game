@@ -84,6 +84,19 @@ if __name__ == "__main__":
     query_path = sys.argv[1]
     engines = sys.argv[2:]
     queries = list(read_queries(query_path))
+
+    details = {}
+    for engine in engines:
+      dirname = os.path.split(os.path.abspath(__file__))[0]
+      dirname = path.dirname(dirname)
+      dirname = path.join(dirname, "engines")
+      details_file = path.join(dirname, engine, "details.json")
+      if os.path.exists(details_file):
+        with open(details_file, "r") as f:
+          details[engine] = json.loads(f.read())
+      else:
+        details[engine] = []
+
     results = {}
     for command in COMMANDS:
         results_commands = {}
@@ -130,4 +143,4 @@ if __name__ == "__main__":
         print(results_commands.keys())
         results[command] = results_commands
     with open("results.json" , "w") as f:
-        json.dump(results, f, default=lambda obj: obj.__dict__)
+        json.dump({ "details": details, "results": results }, f, default=lambda obj: obj.__dict__)
