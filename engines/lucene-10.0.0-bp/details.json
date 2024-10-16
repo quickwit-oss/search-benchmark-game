@@ -1,0 +1,11 @@
+[
+  "Written in Java.",
+  "Index is read from disk via mmap.",
+  "Doc-at-a-time.",
+  "Doc deltas are encoded using FOR-delta, frequencies and positions are encoded using PFOR-delta and blocks of size 128.",
+  "2 levels of skip data, every 128 and 4,096 docs, inlined in postings.",
+  "Impacts are decomposed into pareto-optimal (freq, norm) pairs, stored within skip data.",
+  "Implements block-max MAXSCORE and block-max AND for top-k commands.",
+  "Disjunctions reorder/count matching doc IDs using bit sets over windows of 4,096 docs.",
+  "Doc IDs are reordered using recursive graph bisection."
+]
