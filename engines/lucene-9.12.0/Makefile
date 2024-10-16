@@ -4,7 +4,7 @@ clean:
 	@rm -fr build
 
 serve:
-	@java -XX:+UseParallelGC -cp "build/libs/search-index-benchmark-game-lucene-1.0-SNAPSHOT.jar:build/dependencies/*" DoQuery idx
+	@java -XX:+UseParallelGC --add-modules jdk.incubator.vector -cp "build/libs/search-index-benchmark-game-lucene-1.0-SNAPSHOT.jar:build/dependencies/*" DoQuery idx
 
 index: idx
 
