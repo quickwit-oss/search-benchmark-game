@@ -75,7 +75,7 @@ def printProgressBar (progress, prefix = '', suffix = '', decimals = 1, length =
     if progress >= 1:
         print()
 
-WARMUP_TIME = 10 * 60 # 10 minutes
+WARMUP_TIME = 20 # 10 minutes
 NUM_ITER = 10
 
 if __name__ == "__main__":
