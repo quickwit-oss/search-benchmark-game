@@ -14,12 +14,22 @@ for line in fileinput.input():
     except ValueError:
         continue
 
-    if doc["url"] == "":
+    url = doc["url"]
+    if url == "":
         continue
 
+    filters = []
+    id_hash = hash(doc["url"])
+    if id_hash % 10 == 3:
+        filters.append("10%")
+    if id_hash % 100 == 42:
+        filters.append("1%")
+
     doc_transformed = {
-        "id": doc["url"],
+        "id": url,
         "text": transform(doc["body"])
     }
+    if len(filters) > 0:
+        doc_transformed["filters"] = filters
 
     print(json.dumps(doc_transformed))

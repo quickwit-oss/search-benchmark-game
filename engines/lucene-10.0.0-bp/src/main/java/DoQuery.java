@@ -8,15 +8,23 @@ import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollectorManager;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.FSDirectory;
 
 public class DoQuery {
+
+    private static final String TEN_PERCENT_FILTER = "_FILTER_10%";
+    private static final String ONE_PERCENT_FILTER = "_FILTER_1%";
+
     public static void main(String[] args) throws IOException, ParseException {
         final Path indexDir = Paths.get(args[0]);
         try (IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
@@ -29,9 +37,18 @@ public class DoQuery {
             while ((line = bufferedReader.readLine()) != null) {
                 final String[] fields = line.trim().split("\t");
                 assert fields.length == 2;
-                final String command = fields[0];
+                String command = fields[0];
                 final String query_str = fields[1];
                 Query query = queryParser.parse(query_str);
+                if (command.endsWith(TEN_PERCENT_FILTER)) {
+                    Query filter = new TermQuery(new Term("filters", "10%"));
+                    command = command.substring(0, command.length() - TEN_PERCENT_FILTER.length());
+                    query = new BooleanQuery.Builder().add(query, Occur.MUST).add(filter, Occur.FILTER).build();
+                } else if (command.endsWith(ONE_PERCENT_FILTER)) {
+                    Query filter = new TermQuery(new Term("filters", "1%"));
+                    command = command.substring(0, command.length() - ONE_PERCENT_FILTER.length());
+                    query = new BooleanQuery.Builder().add(query, Occur.MUST).add(filter, Occur.FILTER).build();
+                }
                 final long count;
                 switch (command) {
                 case "COUNT":
