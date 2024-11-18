@@ -75,17 +75,17 @@ public class BuildIndex {
 						final JsonObject parsed_doc = Json.parse(line).asObject();
 						final String id = parsed_doc.get("id").asString();
 						final String text = parsed_doc.get("text").asString();
-						final JsonValue filters = parsed_doc.get("filters");
+						final JsonValue filter = parsed_doc.get("filter");
 						idField.setStringValue(id);
 						textField.setStringValue(text);
 
 						Document document = new Document();
 						document.add(idField);
 						document.add(textField);
-						if (filters != null) {
-							JsonArray filterArray = filters.asArray();
+						if (filter != null) {
+							JsonArray filterArray = filter.asArray();
 							for (int j = 0; j < filterArray.size(); ++j) {
-								document.add(new StringField("filters", filterArray.get(j).asString(), Field.Store.NO));
+								document.add(new StringField("filter", filterArray.get(j).asString(), Field.Store.NO));
 							}
 						}
 
