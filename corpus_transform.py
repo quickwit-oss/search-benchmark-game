@@ -20,6 +20,9 @@ for line in fileinput.input():
 
     filters = []
     id_hash = hash(doc["url"])
+
+    if id_hash % 2 == 0:
+        filters.append("50%")
     if id_hash % 10 == 3:
         filters.append("10%")
     if id_hash % 100 == 42:
@@ -30,6 +33,6 @@ for line in fileinput.input():
         "text": transform(doc["body"])
     }
     if len(filters) > 0:
-        doc_transformed["filters"] = filters
+        doc_transformed["filter"] = filters
 
     print(json.dumps(doc_transformed))
