@@ -15,6 +15,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -26,7 +27,9 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.ThreadInterruptedException;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 public class BuildIndex {
 
@@ -37,11 +40,11 @@ public class BuildIndex {
 		final IndexWriterConfig config = new IndexWriterConfig(standardAnalyzer)
 				.setRAMBufferSizeMB(1024)
 				.setOpenMode(OpenMode.CREATE);
-        final BPIndexReorderer reorderer = new BPIndexReorderer();
-        reorderer.setRAMBudgetMB(256);
-        final BPReorderingMergePolicy mp = new BPReorderingMergePolicy(config.getMergePolicy(), reorderer);
-        mp.setMinNaturalMergeNumDocs(Integer.MAX_VALUE); // only reorder at force-merge time
-        config.setMergePolicy(mp);
+		final BPIndexReorderer reorderer = new BPIndexReorderer();
+		reorderer.setRAMBudgetMB(256);
+		final BPReorderingMergePolicy mp = new BPReorderingMergePolicy(config.getMergePolicy(), reorderer);
+		mp.setMinNaturalMergeNumDocs(Integer.MAX_VALUE); // only reorder at force-merge time
+		config.setMergePolicy(mp);
 
 		try (Directory dir = FSDirectory.open(outputPath);
 				IndexWriter writer = new IndexWriter(dir, config);
@@ -53,12 +56,8 @@ public class BuildIndex {
 			final AtomicInteger indexed = new AtomicInteger();
 			for (int i = 0; i < threads.length; ++i) {
 
-				final Document document = new Document();
 				StoredField idField = new StoredField("id", "");
 				TextField textField = new TextField("text", "", Field.Store.NO);
-
-				document.add(idField);
-				document.add(textField);
 
 				threads[i] = new Thread(() -> {
 					while (true) {
@@ -83,13 +82,25 @@ public class BuildIndex {
 						final JsonObject parsed_doc = Json.parse(line).asObject();
 						final String id = parsed_doc.get("id").asString();
 						final String text = parsed_doc.get("text").asString();
+						final JsonValue filter = parsed_doc.get("filter");
 						idField.setStringValue(id);
 						textField.setStringValue(text);
+
+						Document document = new Document();
+						document.add(idField);
+						document.add(textField);
+						if (filter != null) {
+							JsonArray filterArray = filter.asArray();
+							for (int j = 0; j < filterArray.size(); ++j) {
+								document.add(new StringField("filter", filterArray.get(j).asString(), Field.Store.NO));
+							}
+						}
+
 						try {
 							writer.addDocument(document);
 							final int numIndexed = indexed.getAndIncrement();
 							if (numIndexed % 100_000 == 0) {
-							    System.out.println("Indexed: " + numIndexed);
+								System.out.println("Indexed: " + numIndexed);
 							}
 						} catch (IOException e) {
 							throw new UncheckedIOException(e);
