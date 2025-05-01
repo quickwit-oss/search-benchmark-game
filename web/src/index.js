@@ -78,7 +78,7 @@ class Benchmark extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mode: "TOP_100",
+      mode: "TOP_10",
       tag: null
     };
   }
@@ -90,7 +90,7 @@ class Benchmark extends React.Component {
   handleChangeTag(evt) {
     var tag = evt.target.value;
     if (tag === "ALL") {
-      this.setState({ "tag": undefined });
+      this.setState({ "tag": null });
     } else {
       this.setState({ "tag": tag });
     }
@@ -98,7 +98,7 @@ class Benchmark extends React.Component {
 
   filterQueries(queries) {
     let tag = this.state.tag;
-    if (tag !== undefined) {
+    if (tag !== null) {
       return queries.filter(query => query.tags.indexOf(tag) >= 0);
     } else {
       return queries;
