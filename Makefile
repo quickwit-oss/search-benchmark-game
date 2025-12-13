@@ -10,6 +10,7 @@ COMMANDS ?=  TOP_100_COUNT TOP_100 COUNT
 # ENGINES ?= tantivy-0.16 tantivy-0.17 tantivy-0.18 tantivy-0.19
 ENGINES ?= tantivy-0.22 tantivy-0.24 tantivy-0.25 lucene-10.3.0 lucene-10.3.0-bp
 PORT ?= 8080
+WARMUP_TIME ?= 60
 
 help:
 	@grep '^[^#[:space:]].*:' Makefile
