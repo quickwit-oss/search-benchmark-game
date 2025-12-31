@@ -108,6 +108,7 @@ Run `make index` to create the indices for the engines.
 make index
 ```
 
+Run `make compile` to compile the query execution layer.
 Run `make bench` to build the different project and run the benches.
 This command may take more than 30mn.
 
