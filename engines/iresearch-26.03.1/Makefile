@@ -1,22 +1,22 @@
+submodules:
+	@git -C serenedb submodule update --init --recursive --jobs $$(nproc)
+
 clean:
 	@echo "--- Cleaning iresearch ---"
 	@rm -rf build
 
-compile:
+compile: submodules
 	@echo "--- Building iresearch ---"
-	@git submodule update --init --jobs $$(nproc)
 	@cmake -S serenedb -B build --preset bench
 	@cmake --build build -t search-benchmark-game
 
-compile_debug:
+compile_debug: submodules
 	@echo "--- Building iresearch ---"
-	@git submodule update --init --jobs $$(nproc)
 	@cmake -S serenedb -B build_debug --preset lldb
 	@cmake --build build_debug -t search-benchmark-game
 
-compile_gen_pgo:
+compile_gen_pgo: submodules
 	@echo "--- Building iresearch (base PGO gen) ---"
-	@git submodule update --init --jobs $$(nproc)
 	@cmake -S serenedb -B build --preset bench -DSDB_GEN_PGO=ON
 	@env LLVM_PROFILE_FILE="$(CURDIR)/pgo/code-%p.profraw" cmake --build build -t search-benchmark-game
 

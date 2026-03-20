@@ -1,6 +1,6 @@
 [submodule "engines/pisa-0.8.2/pisa"]
 	path = engines/pisa-0.8.2/pisa
 	url = https://github.com/pisa-engine/pisa.git
-[submodule "engines/iresearch/serenedb"]
-	path = engines/iresearch/serenedb
+[submodule "engines/iresearch-26.03.1/serenedb"]
+	path = engines/iresearch-26.03.1/serenedb
 	url = git@github.com:serenedb/serenedb.git
