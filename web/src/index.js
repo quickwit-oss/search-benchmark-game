@@ -1,7 +1,7 @@
 import React from 'react';
 import $ from 'jquery';
 import ReactDOM from 'react-dom';
-import './style.scss'
+import './style.css'
 import * as serviceWorker from './serviceWorker';
 
 function formatPercentVariation(p) {
@@ -78,7 +78,7 @@ class Benchmark extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mode: "TOP_10",
+      mode: this.props.initialMode,
       tag: null
     };
   }
@@ -269,7 +269,7 @@ $(function () {
     tags.sort();
     var el = document.getElementById("app-container");
     ReactDOM.render(<React.StrictMode>
-      <Benchmark data={data} tags={tags} modes={modes} engines={engines} />
+      <Benchmark data={data} tags={tags} modes={modes} initialMode={modes[0]} engines={engines} />
     </React.StrictMode>, el);
   });
 });
