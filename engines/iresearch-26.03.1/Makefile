@@ -3,6 +3,7 @@ submodules:
 
 clean:
 	@echo "--- Cleaning iresearch ---"
+	@rm -fr idx
 	@rm -rf build
 
 compile: submodules

@@ -1,0 +1,13 @@
+[
+  "Written in C++ to powers SereneDB.",
+  "Index is read from disk via mmap.",
+  "Doc-at-a-time for blocks, Term-at-a-time in blocks, in other words Block-at-a-time.",
+  "Doc deltas, frequencies and positions deltas are encoded using combination of Lemire's simdcomp (bitpacking), streamvbyte (varbyte), bitset library with blocks of size 128.",
+  "Has skiplist, every 32 blocks",
+  "Impacts are inlined into skip data as an approximation only the optimal `(term_freq, norm)` pair for the block is stored.",
+  "This argmax is computed assuming the current segment statistics. During search, these args are reinjected into the BM25 formula with the global statistics.",
+  "There's alternative technics for impacts that also can be used, like precise `(term_freq, norm)` for bm25, it doesn't depend on avg_dl, because create virtual pair that worse than actual",
+  "Implements block Maxscore for OR and block WAND term for top-k commands.",
+  "Impacts are stored directly, and require a single segment.",
+  "Disjunctions and some conjunctions count matching doc IDs using bit sets over windows of 4,096 docs."
+]

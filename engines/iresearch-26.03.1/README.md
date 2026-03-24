@@ -1,3 +1,14 @@
+### Build requirements
+
+- git -- not very old to clone submodules
+- cmake -- version 3.28.3 or higher
+- clang -- version 21.1.8 or higher
+- lld -- version 21.1.8 or higher
+- glibc -- version 2.35 or higher (lower can be also ok, but we didn't check)
+
+Everything else build from source!
+And you don't need to do anything for it.
+
 ### About indexing speed
 
 Although iresearch supports parallel indexing (as do Lucene and Tantivy), we intentionally use single-threaded indexing for benchmarks. This makes indexing slower, but keeps results more consistent and comparable across engines.
