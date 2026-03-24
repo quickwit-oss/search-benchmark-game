@@ -1,5 +1,5 @@
 [
-  "Written in C++ to powers SereneDB.",
+  "Written in C++ to power SereneDB.",
   "Index is read from disk via mmap.",
   "Doc-at-a-time for blocks, Term-at-a-time in blocks, in other words Block-at-a-time.",
   "Doc deltas, frequencies and positions deltas are encoded using combination of Lemire's simdcomp (bitpacking), streamvbyte (varbyte), bitset library with blocks of size 128.",
