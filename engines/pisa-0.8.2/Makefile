@@ -18,8 +18,10 @@ compile:
 
 index: idx
 
+TBB_LIB := $(shell pwd)/build/pisa/external/tbb_cmake_build/tbb_cmake_build_subdir_release
+
 serve: build/bin/do_query
-	@./build/bin/do_query idx
+	@LD_LIBRARY_PATH=$(TBB_LIB) ./build/bin/do_query idx
 
 build/bin/%:
 	@echo "--- Building PISA 0.8.2 ---"
@@ -30,4 +32,4 @@ build/bin/%:
 idx: build/bin/build_index
 	@echo "--- Indexing PISA 0.8.2 ---"
 	@mkdir -p idx
-	@./build/bin/build_index < ${CORPUS}
+	@LD_LIBRARY_PATH=$(TBB_LIB) ./build/bin/build_index < ${CORPUS}
