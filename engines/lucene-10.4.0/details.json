@@ -2,8 +2,8 @@
   "Written in Java.",
   "Index is read from disk via mmap.",
   "Doc-at-a-time.",
-  "Doc IDs are encoded as bit sets on dense blocks and FOR-delta otherwise, frequencies and position deltas are encoded using PFOR. Block size is 128.",
-  "2 levels of skip data, every 128 and 4,096 docs, inlined in postings.",
+  "Doc IDs are encoded as bit sets on dense blocks and FOR-delta otherwise, frequencies and position deltas are encoded using PFOR. Block size is 256.",
+  "2 levels of skip data, every 256 and 8,192 docs, inlined in postings.",
   "Impacts are decomposed into pareto-optimal (freq, norm) pairs, stored within skip data.",
   "Implements vectorized variants of block-max MAXSCORE and block-max AND for top-k commands.",
   "Disjunctions and dense conjunctions reorder/count matching doc IDs using bit sets over windows of 4,096 docs."
