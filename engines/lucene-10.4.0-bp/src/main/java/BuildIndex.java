@@ -14,6 +14,7 @@ import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -56,9 +57,11 @@ public class BuildIndex {
 				final Document document = new Document();
 				StoredField idField = new StoredField("id", "");
 				TextField textField = new TextField("text", "", Field.Store.NO);
+				NumericDocValuesField sortField = new NumericDocValuesField("sort_field", 0);
 
 				document.add(idField);
 				document.add(textField);
+				document.add(sortField);
 
 				threads[i] = new Thread(() -> {
 					while (true) {
@@ -83,8 +86,10 @@ public class BuildIndex {
 						final JsonObject parsed_doc = Json.parse(line).asObject();
 						final String id = parsed_doc.get("id").asString();
 						final String text = parsed_doc.get("text").asString();
+						final long sortValue = parsed_doc.get("sort_field").asLong();
 						idField.setStringValue(id);
 						textField.setStringValue(text);
+						sortField.setLongValue(sortValue);
 						try {
 							writer.addDocument(document);
 							final int numIndexed = indexed.getAndIncrement();

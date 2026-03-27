@@ -12,6 +12,9 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopFieldCollectorManager;
 import org.apache.lucene.search.TopScoreDocCollectorManager;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.FSDirectory;
@@ -69,6 +72,27 @@ public class DoQuery {
                 case "TOP_1000_COUNT":
                 {
                    count = searcher.search(query, new TopScoreDocCollectorManager(1000, null, Integer.MAX_VALUE, false)).totalHits.value();
+                }
+                break;
+                case "TOP_10_FF":
+                {
+                    Sort sort = new Sort(new SortField("sort_field", SortField.Type.LONG, true));
+                    searcher.search(query, new TopFieldCollectorManager(sort, 10, null, 10, false));
+                    count = 1;
+                }
+                break;
+                case "TOP_100_FF":
+                {
+                    Sort sort = new Sort(new SortField("sort_field", SortField.Type.LONG, true));
+                    searcher.search(query, new TopFieldCollectorManager(sort, 100, null, 100, false));
+                    count = 1;
+                }
+                break;
+                case "TOP_1000_FF":
+                {
+                    Sort sort = new Sort(new SortField("sort_field", SortField.Type.LONG, true));
+                    searcher.search(query, new TopFieldCollectorManager(sort, 1000, null, 1000, false));
+                    count = 1;
                 }
                 break;
                 default:
