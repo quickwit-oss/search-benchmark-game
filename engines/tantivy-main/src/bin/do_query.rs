@@ -4,7 +4,7 @@ extern crate tantivy;
 use tantivy::collector::{Collector, Count, SegmentCollector, TopDocs};
 use tantivy::query::{QueryParser, Weight};
 use tantivy::tokenizer::TokenizerManager;
-use tantivy::{DocId, Index, Score, SegmentReader, TERMINATED};
+use tantivy::{DocId, Index, Order, Score, SegmentReader, TERMINATED};
 
 use std::collections::BinaryHeap;
 use std::env;
@@ -204,6 +204,18 @@ fn main_inner(index_dir: &Path) -> tantivy::Result<()> {
                 let (_top_k, count_) = searcher
                     .search(&query, &(TopDocs::with_limit(1000).order_by_score(), Count))?;
                 count = count_;
+            }
+            "TOP_10_FF" => {
+                let _top_k = searcher.search(&query, &TopDocs::with_limit(10).order_by_fast_field::<u64>("sort_field", Order::Desc))?;
+                count = 1;
+            }
+            "TOP_100_FF" => {
+                let _top_k = searcher.search(&query, &TopDocs::with_limit(100).order_by_fast_field::<u64>("sort_field", Order::Desc))?;
+                count = 1;
+            }
+            "TOP_1000_FF" => {
+                let _top_k = searcher.search(&query, &TopDocs::with_limit(1000).order_by_fast_field::<u64>("sort_field", Order::Desc))?;
+                count = 1;
             }
             "DEBUG_TOP_10" => {
                 let weight = query.weight(tantivy::query::EnableScoring::enabled_from_searcher(
