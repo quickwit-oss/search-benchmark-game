@@ -1,3 +1,7 @@
+ROOT_DIR := $(abspath $(CURDIR)/../..)
+DOCKER_IMAGE ?= iresearch-26.03.1-builder
+DOCKER_TARGETARCH ?= $(shell uname -m | sed -e 's/^x86_64$$/amd64/' -e 's/^aarch64$$/arm64/')
+
 submodules:
 	@git -C serenedb submodule update --init --recursive --jobs $$(nproc)
 
@@ -7,9 +11,15 @@ clean:
 	@rm -rf build
 
 compile: submodules
-	@echo "--- Building iresearch ---"
-	@cmake -S serenedb -B build --preset bench
-	@cmake --build build -t search-benchmark-game
+	@echo "--- Building iresearch in docker ---"
+	@docker build --build-arg TARGETARCH=$(DOCKER_TARGETARCH) -t $(DOCKER_IMAGE) $(ROOT_DIR)
+	@rm -rf build
+	@mkdir -p build/bin
+	@docker run --rm \
+		-v "$(CURDIR):/src:ro" \
+		-v "$(CURDIR)/build/bin:/out" \
+		$(DOCKER_IMAGE) \
+		bash -lc 'rm -rf /container-build && mkdir -p /container-build && cp -a /src/serenedb /container-build/serenedb && cmake -S /container-build/serenedb -B /container-build/build --preset bench && cmake --build /container-build/build -t search-benchmark-game && cp /container-build/build/bin/search-benchmark-game-* /out/'
 
 compile_debug: submodules
 	@echo "--- Building iresearch ---"
