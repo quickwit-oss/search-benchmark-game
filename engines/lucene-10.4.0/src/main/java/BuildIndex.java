@@ -79,7 +79,7 @@ public class BuildIndex {
 						final JsonObject parsed_doc = Json.parse(line).asObject();
 						final String id = parsed_doc.get("id").asString();
 						final String text = parsed_doc.get("text").asString();
-						final long sortValue = parsed_doc.get("sort_field").asLong();
+						final long sortValue = parsed_doc.getLong("sort_field", 0L);
 						idField.setStringValue(id);
 						textField.setStringValue(text);
 						sortField.setLongValue(sortValue);
