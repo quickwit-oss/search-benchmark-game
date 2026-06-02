@@ -1,0 +1,13 @@
+[
+  "Written in Rust.",
+  "Benchmarks infino's embedded BM25 FTS index — one infino superfile is a valid Apache Parquet file with this index baked in.",
+  "Index blob is read into memory and searched in-process.",
+  "Doc-at-a-time.",
+  "Term dictionary is an FST; postings are PFOR-delta encoded with a skip table.",
+  "BM25 with Lucene defaults (k1=1.2, b=0.75) and Lucene-style IDF.",
+  "Per-doc length normalization is precomputed at build time and stored alongside the postings.",
+  "Single-term and intersection (AND) top-k use BlockMaxWAND over the skip table.",
+  "Disjunction (OR) top-k chooses between WAND/BlockMaxWAND and MaxScore/Block-Max-MaxScore.",
+  "Posting scoring is SIMD-accelerated (4 terms at a time).",
+  "Phrase queries and fast-field ordering are unsupported (no positional postings, score-ordered results only)."
+]
