@@ -55,12 +55,11 @@ Out of 10 runs, we only retain the best score, so Garbage Collection likely does
 
 The results file that is included in this repository was generated using the following benchmark
 environment:
- - AWS c7i.2xlarge instance running on us-east-1
- - Processor Intel(R) Xeon(R) Platinum 8488C
- - Amazon Linux 2023
- - Kernel `6.1.148-173.267.amzn2023.x86_64`
- - Rust 1.89
- - Adoptium JDK `Temurin-21.0.8+9`
+ - Processor AMD Ryzen 7 9800X3D
+ - Manjaro Linux (rolling)
+ - Kernel `7.0.3-1-MANJARO`
+ - Rust 1.96.0
+ - OpenJDK 21.0.11
 
 ## Engine specific detail
 
