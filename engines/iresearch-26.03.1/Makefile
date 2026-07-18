@@ -1,9 +1,11 @@
 ROOT_DIR := $(abspath $(CURDIR)/../..)
 DOCKER_IMAGE ?= iresearch-26.03.1-builder
 DOCKER_TARGETARCH ?= $(shell uname -m | sed -e 's/^x86_64$$/amd64/' -e 's/^aarch64$$/arm64/')
+HOST_OS := $(shell uname -s)
+RUN_IN_DOCKER ?= $(if $(filter Darwin,$(HOST_OS)),1,0)
 
 submodules:
-	@git -C serenedb submodule update --init --recursive --jobs $$(nproc)
+	@git -C serenedb submodule update --init --recursive --jobs $$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 1)
 
 clean:
 	@echo "--- Cleaning iresearch ---"
@@ -44,10 +46,18 @@ compile_use_pgo:
 index:
 	@echo "--- Indexing iresearch ---"
 	@mkdir -p idx
+ifeq ($(RUN_IN_DOCKER),1)
+	@docker run --rm --user "$$(id -u):$$(id -g)" -v "$(CURDIR):/work" -w /work -i $(DOCKER_IMAGE) ./build/bin/search-benchmark-game-build < ${CORPUS}
+else
 	@./build/bin/search-benchmark-game-build < ${CORPUS}
+endif
 
 serve:
+ifeq ($(RUN_IN_DOCKER),1)
+	@docker run --rm --user "$$(id -u):$$(id -g)" -v "$(CURDIR):/work" -w /work -i $(DOCKER_IMAGE) ./build/bin/search-benchmark-game-query idx
+else
 	@./build/bin/search-benchmark-game-query idx
+endif
 
 serve_perf:
 	@perf record -g -F 997 -o perf.data -- ./build/bin/search-benchmark-game-query idx

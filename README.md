@@ -55,12 +55,11 @@ Out of 10 runs, we only retain the best score, so Garbage Collection likely does
 
 The results file that is included in this repository was generated using the following benchmark
 environment:
- - AWS c7i.2xlarge instance running on us-east-1
- - Processor Intel(R) Xeon(R) Platinum 8488C
- - Amazon Linux 2023
- - Kernel `6.1.148-173.267.amzn2023.x86_64`
- - Rust 1.89
- - Adoptium JDK `Temurin-21.0.8+9`
+ - Processor AMD Ryzen 7 9800X3D
+ - Manjaro Linux (rolling)
+ - Kernel `7.0.3-1-MANJARO`
+ - Rust 1.96.0
+ - OpenJDK 21.0.11
 
 ## Engine specific detail
 
@@ -126,6 +125,23 @@ make serve
 
 And open the following in your browser: [http://localhost:8080/](http://localhost:8080/)
 
+For a quick text summary from `results.json` without opening the browser:
+
+```
+python tools/analyze.py <engine> <command> [--filter <tag>]
+```
+
+- `<engine>` — e.g. `tantivy-main`, `tantivy-0.26`, `iresearch-26.03.1`
+- `<command>` — `TOP_100`, `TOP_100_COUNT`, or `COUNT`
+- `--filter` — optional tag filter: `union`, `intersection`, or `intersection_union`
+
+Examples:
+```
+python tools/analyze.py tantivy-main TOP_100_COUNT
+python tools/analyze.py tantivy-main TOP_100 --filter union
+```
+
+It prints query count, sample count, and avg/min/max/p50/p95/p99 latencies (in µs).
 
 # Adding another search engine
 
