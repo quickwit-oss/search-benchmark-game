@@ -22,13 +22,11 @@ function numberWithCommas(x) {
 }
 
 function stats(timings) {
-  let median = timings[(timings.length / 2) | 0];
-  let mean = timings.reduce(((pv, cv) => pv + cv), 0) / timings.length;
+  const total = timings.reduce(((pv, cv) => pv + cv), 0);
   return {
-    "median": median,
-    "mean": mean,
-    "min": timings[0],
-    "max": timings[timings.length - 1]
+    average: total / timings.length,
+    total,
+    sampleCount: timings.length
   };
 }
 
@@ -51,7 +49,7 @@ function stats_row(engines, name, className, stat) {
                 var engine_stats = kv[1];
                 if (engine_stats !== undefined) {
                   return <td key={"result-" + engine}>
-                    {numberWithCommas(engine_stats[stat])} μs
+                    {numberWithCommas(Math.round(engine_stats[stat]))} μs
                 </td>;
                 } else {
                   return <td key={"result-" + engine}>
@@ -115,6 +113,7 @@ class Benchmark extends React.Component {
       engine_queries = Array.from(this.filterQueries(engine_queries));
       engine_queries = engine_queries.map(aggregate);
       var total = 0
+      var sampleCount = 0
       var p50 = 0
       var p90 = 0
       var p99 = 0
@@ -124,8 +123,9 @@ class Benchmark extends React.Component {
         if (query.unsupported) {
           unsupported = true;
         } else {
-          total += query.min;
-          all_latencies.push(query.min);
+          total += query.total;
+          sampleCount += query.sampleCount;
+          all_latencies.push(query.average);
         }
       }
       if (unsupported) {
@@ -134,7 +134,7 @@ class Benchmark extends React.Component {
         p90 = undefined;
         p99 = undefined;
       } else {
-        total = (total / engine_queries.length) | 0;
+        total = sampleCount === 0 ? 0 : total / sampleCount;
         if (all_latencies.length !== 0) {
           all_latencies.sort(function(a, b) { return a - b; });
           p50 = all_latencies[Math.round((all_latencies.length - 1) * 0.5)];
@@ -163,20 +163,20 @@ class Benchmark extends React.Component {
         var engine_data = query_data[engine];
         if (engine_data.unsupported)
           continue;
-        if (min_engine == null || engine_data.min < min_microsecs) {
+        if (min_engine == null || engine_data.average < min_microsecs) {
           min_engine = engine;
-          min_microsecs = engine_data.min;
+          min_microsecs = engine_data.average;
         }
-        if (max_engine == null || engine_data.min > max_microsecs) {
+        if (max_engine == null || engine_data.average > max_microsecs) {
           max_engine = engine;
-          max_microsecs = engine_data.min;
+          max_microsecs = engine_data.average;
         }
       }
       for (let engine in query_data) {
         let engine_data = query_data[engine];
         if (engine_data.unsupported) continue;
         if (engine !== min_engine) {
-          engine_data.variation = (engine_data.min - min_microsecs) / min_microsecs;
+          engine_data.variation = (engine_data.average - min_microsecs) / min_microsecs;
         }
       }
       if (min_engine != null) {
@@ -216,6 +216,7 @@ class Benchmark extends React.Component {
         </thead>
         <tbody>
           { stats_row(data_view.engines, "AVERAGE", "average", "average") }
+          {/* Percentiles are calculated across per-query averages. */}
           { stats_row(data_view.engines, "P50", "percentile", "p50") }
           { stats_row(data_view.engines, "P90", "percentile", "p90") }
           { stats_row(data_view.engines, "P99", "percentile", "p99") }
@@ -232,7 +233,7 @@ class Benchmark extends React.Component {
                       return <td className={"data " + cell_data.className}></td>;
                     } else {
                       return <td className={"data " + cell_data.className}>
-                        <div className="timing">{numberWithCommas(cell_data.min)}  μs</div>
+                        <div className="timing">{numberWithCommas(Math.round(cell_data.average))}  μs</div>
                         <div className="timing-variation">{formatPercentVariation(cell_data.variation)}</div>
                         <div className="count">{numberWithCommas(cell_data.count)} docs</div>
                       </td>;
