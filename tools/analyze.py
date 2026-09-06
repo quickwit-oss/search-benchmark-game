@@ -2,10 +2,11 @@
 """Analyze and compare search-benchmark-game results.
 
 Examples:
-    python tools/analyze.py tantivy-main TOP_100_COUNT
-    python tools/analyze.py tantivy-perf TOP_100_COUNT --compare tantivy-main
-    python tools/analyze.py tantivy-perf all --compare tantivy-main --all-filters
-    python tools/analyze.py tantivy-perf all --compare tantivy-main --format tsv
+    python tools/analyze.py tantivy-main
+    python tools/analyze.py tantivy-main --command TOP_100_COUNT
+    python tools/analyze.py tantivy-perf --command TOP_100_COUNT --compare tantivy-main
+    python tools/analyze.py tantivy-perf --compare tantivy-main --all-filters
+    python tools/analyze.py tantivy-perf --compare tantivy-main --format tsv
 """
 
 import argparse
@@ -238,7 +239,9 @@ def print_tsv(rows: list[dict]) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("engine", help="candidate engine name")
-    parser.add_argument("command", help="benchmark command, or 'all'")
+    parser.add_argument(
+        "--command", default="all", help="benchmark command, or 'all' (default: all)"
+    )
     parser.add_argument(
         "--compare", "-c", metavar="ENGINE", help="baseline engine to compare against"
     )

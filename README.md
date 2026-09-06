@@ -128,17 +128,18 @@ And open the following in your browser: [http://localhost:8080/](http://localhos
 For a quick text summary from `results.json` without opening the browser:
 
 ```
-python tools/analyze.py <engine> <command> [--filter <tag>]
+python tools/analyze.py <engine> [--command <command>] [--filter <tag>]
 ```
 
 - `<engine>` — e.g. `tantivy-main`, `tantivy-0.26`, `iresearch-26.03.1`
-- `<command>` — `TOP_100`, `TOP_100_COUNT`, or `COUNT`
+- `--command` — benchmark command such as `TOP_100`, `TOP_100_COUNT`, or `COUNT`; defaults to `all`
 - `--filter` — optional tag filter: `union`, `intersection`, or `intersection_union`
 
 Examples:
 ```
-python tools/analyze.py tantivy-main TOP_100_COUNT
-python tools/analyze.py tantivy-main TOP_100 --filter union
+python tools/analyze.py tantivy-main
+python tools/analyze.py tantivy-main --command TOP_100_COUNT
+python tools/analyze.py tantivy-main --command TOP_100 --filter union
 ```
 
 It prints query count, sample count, and avg/min/max/p50/p95/p99 latencies (in µs).
