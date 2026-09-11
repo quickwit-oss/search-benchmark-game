@@ -1,0 +1,10 @@
+[
+  "Written in Rust.",
+  "Benchmarks infino's supertable query path — manifest + single superfile segment (built in multiple incremental commits, then compacted to one), each segment a valid Apache Parquet file with an embedded BM25 index.",
+  "All segments preloaded into an in-memory reader tier; queries are fully synchronous (no per-query async/tokio overhead).",
+  "Doc-at-a-time; term dictionary is an FST; postings are PFOR-delta encoded with a skip table.",
+  "BM25 with Lucene defaults (k1=1.2, b=0.75) and Lucene-style IDF.",
+  "Per-doc length normalization precomputed at build time.",
+  "Top-k uses BlockMaxWAND (single-term, AND) and WAND/BlockMaxWAND vs MaxScore/Block-Max-MaxScore (OR). SIMD-accelerated scoring (4 terms at a time).",
+  "Benchmarked: ranked TOP_10/100/1000 and COUNT/*_COUNT (native posting-list count, no scoring). Lucene BooleanQuery clause semantics parsed natively: +must, bare should (scoring-only when a must exists), -must-not, and exact phrases verified against positional postings. Unsupported: *_FF (score-ordered only)."
+]
