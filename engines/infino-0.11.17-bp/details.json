@@ -1,0 +1,13 @@
+[
+  "Written in Rust.",
+  "Built from the published infino crate — the 0.11.17 release.",
+  "Benchmarks infino's supertable query path — manifest + single superfile segment (built in multiple incremental commits, then compacted to one), each segment a valid Apache Parquet file with an embedded BM25 index.",
+  "All segments preloaded into an in-memory reader tier; queries are fully synchronous (no per-query async/tokio overhead).",
+  "Doc-at-a-time; the term dictionary is front-coded term blocks (an FST backs only the term-stats sidecar); postings are PFOR-delta encoded with a skip table.",
+  "Doc IDs are reordered using recursive graph bisection. Unlike Lucene's offline BP pass, the reordering is maintained under real-time updates.",
+  "BM25 with Lucene defaults (k1=1.2, b=0.75) and Lucene-style IDF.",
+  "Per-doc length normalization precomputed at build time.",
+  "Top-k uses BlockMaxWAND (single-term, AND) and WAND/BlockMaxWAND vs MaxScore/Block-Max-MaxScore (OR). SIMD-accelerated scoring (4 terms at a time).",
+  "Before the main walk, top-k seeds its skip threshold from a lower bound computed up front, so block-skipping prunes from the first block instead of only after the threshold has risen: single-term scores its highest-bound blocks first; unions (k>=64) do the same per term; a rare term paired with common ones is walked alone and the common term(s) only probed, answering straight from that walk when provably complete, else seeding or splitting off the rest as a second query. The bound is a true lower bound in every case, so the top-k and its scores are unchanged.",
+  "Benchmarked: ranked TOP_10/100/1000, COUNT (native posting-list count, no scoring), and TOP_*_COUNT (one exhaustive scored pass, pruning off, returning the top-k and the exact count together). Lucene BooleanQuery clause semantics parsed natively: +must, bare should (scoring-only when a must exists), -must-not, and exact phrases verified against positional postings. Unsupported: *_FF (score-ordered only)."
+]
