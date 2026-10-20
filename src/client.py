@@ -131,7 +131,8 @@ if __name__ == "__main__":
             for i in range(NUM_ITER):
                 for (query, count, duration) in drive(queries_shuffled, search_client, command):
                     if count is None:
-                        query_idx[query.query] = {count: -1, duration: []}
+                        query_idx[query.query]["count"] = -1
+                        query_idx[query.query]["duration"] = []
                     else:
                         query_idx[query.query]["count"] = count
                         query_idx[query.query]["duration"].append(duration)
