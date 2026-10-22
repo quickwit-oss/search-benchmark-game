@@ -24,5 +24,5 @@ Rebuild and bench:
 ```bash
 cd engines/<new-tantivy-engine-name>/ && cargo build --release && cd -
 WARMUP_TIME=3 make bench
-python tools/analyze.py <engine> TOP_100_COUNT --filter union
+python tools/analyze.py <engine> --command TOP_100_COUNT --filter union
 ```
