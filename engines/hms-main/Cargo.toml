@@ -1,0 +1,15 @@
+[package]
+name = "hms-bench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+holographic-memory = { git = "https://github.com/writerslogic/holographic-memory", rev = "3b10963b953b31ad0de74bf7fa32d001d5fe6efd" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

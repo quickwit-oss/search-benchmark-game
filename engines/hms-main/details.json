@@ -1,0 +1,8 @@
+[
+  "Written in Rust.",
+  "Index is held in memory and rebuilt at open from the store's append-only journal.",
+  "Term-at-a-time: BM25 is accumulated into a per-slot score table, without WAND or MaxScore pruning.",
+  "Postings are LEB128 varints of (slot delta, frequency) per term.",
+  "Top-k is selected with a bounded heap over the scored slots.",
+  "COUNT marks the matching slots of every query term in a bit set and counts each document once."
+]
