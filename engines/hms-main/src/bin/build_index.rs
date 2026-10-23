@@ -1,5 +1,7 @@
 use anyhow::{Context, Result};
-use holographic_memory::core::documents::{BatchTooLarge, EncodeMode, IngestOptions, MAX_BATCH_ITEMS};
+use holographic_memory::core::documents::{
+    BatchTooLarge, EncodeMode, IngestOptions, MAX_BATCH_ITEMS,
+};
 use holographic_memory::{DocumentInput, HmsCore};
 use serde::Deserialize;
 use std::io::BufRead;
@@ -9,8 +11,7 @@ struct Doc {
     text: String,
 }
 
-/// One document per article: 4096 words is the largest chunk HMS accepts, and no overlap,
-/// so an article only splits when it is longer than that.
+/// One article per lexical chunk; positions remain available without retaining text.
 fn input(ordinal: u64, text: String, chunk_words: u32) -> DocumentInput {
     DocumentInput {
         id: ordinal.to_string(),
@@ -34,7 +35,10 @@ struct Indexer {
 
 impl Indexer {
     fn commit(&mut self, batch: Vec<DocumentInput>) -> Result<()> {
-        match self.core.memorize_documents_with(batch.clone(), &self.options) {
+        match self
+            .core
+            .memorize_documents_with(batch.clone(), &self.options)
+        {
             Ok(_) => Ok(()),
             Err(error) if error.is::<BatchTooLarge>() && batch.len() > 1 => {
                 let mut batch = batch;
@@ -49,12 +53,7 @@ impl Indexer {
                 Ok(())
             }
             Err(error) => {
-                // A chunk of 4096 words can exceed the 64 KiB chunk limit on long tokens.
-                let mut document = batch.into_iter().next().context("empty batch")?;
-                if document.chunk_words != Some(1024) {
-                    document.chunk_words = Some(1024);
-                    return self.commit(vec![document]);
-                }
+                let document = batch.into_iter().next().context("empty batch")?;
                 eprintln!("rejected document {}: {error:#}", document.id);
                 self.rejected += 1;
                 Ok(())
@@ -64,13 +63,17 @@ impl Indexer {
 }
 
 fn main() -> Result<()> {
-    let output = std::env::args().nth(1).context("usage: build_index <index dir>")?;
+    let output = std::env::args()
+        .nth(1)
+        .context("usage: build_index <index dir>")?;
     let mut indexer = Indexer {
         core: HmsCore::new(1024, Some(output), None)?,
         options: IngestOptions {
             encode: EncodeMode::Lexical,
             // The benchmark indexes words as written: no stemming.
             unstemmed: true,
+            positions: true,
+            whole_document: true,
         },
         rejected: 0,
     };
@@ -104,6 +107,14 @@ fn main() -> Result<()> {
         "{ordinal} documents read, {empty} without words skipped, {} rejected",
         indexer.rejected
     );
+    if std::env::var_os("HMS_RESOURCE_RECEIPT").is_some() {
+        let status = std::fs::read_to_string("/proc/self/status")
+            .context("read Linux memory receipt after indexing")?;
+        eprintln!(
+            "HMS_RESOURCE_AFTER_FLUSH={}",
+            serde_json::to_string(&status)?
+        );
+    }
     // The store is durable after flush; skip tearing down the in-memory index.
     std::process::exit(0);
 }

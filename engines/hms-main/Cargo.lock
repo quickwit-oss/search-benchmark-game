@@ -325,7 +325,7 @@ dependencies = [
 [[package]]
 name = "holographic-memory"
 version = "0.6.1"
-source = "git+https://github.com/writerslogic/holographic-memory?rev=3b10963b953b31ad0de74bf7fa32d001d5fe6efd#3b10963b953b31ad0de74bf7fa32d001d5fe6efd"
+source = "git+https://github.com/writerslogic/holographic-memory?rev=a56002cf513a1fe245260c1474626b5bd68d9491#a56002cf513a1fe245260c1474626b5bd68d9491"
 dependencies = [
  "anyhow",
  "bincode",

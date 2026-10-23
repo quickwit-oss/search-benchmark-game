@@ -1,18 +1,20 @@
+INDEX ?= idx
+
+.PHONY: compile clean index serve
 clean:
-	rm -fr idx
+	rm -fr $(INDEX)
 	rm -fr target
 
-compile: target/release/build_index target/release/do_query
+compile:
+	RUSTFLAGS='-C target-cpu=native' cargo build --release --locked --bins
 
-index: idx
+index: $(INDEX)
 
 serve: target/release/do_query
-	@target/release/do_query idx
+	@target/release/do_query $(INDEX)
 
-target/release/%:
-	@echo "\n\n\n--- Building HMS's binary ---"
-	@RUSTFLAGS='-C target-cpu=native' cargo build --release --bin $(notdir $@)
+target/release/build_index target/release/do_query:
+	$(MAKE) compile
 
-idx: target/release/build_index
-	@echo "\n\n\n---- Indexing HMS ----"
+$(INDEX): target/release/build_index
 	target/release/build_index "$@" < ${CORPUS}

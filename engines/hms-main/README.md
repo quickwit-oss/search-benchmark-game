@@ -1,27 +1,29 @@
 # HMS (holographic-memory)
 
-[HMS](https://github.com/writerslogic/holographic-memory) is an Apache-2.0 Rust library for local-first document memory: BM25 lexical search, vector search, and hybrid search over the same store. This engine uses only its lexical side. Documents are memorized with `EncodeMode::Lexical`, so no vectors are computed, and queries go through `HmsCore::search_documents` and `HmsCore::count_documents`. The dependency is pinned to a git revision of `main` in `Cargo.toml`.
+[HMS](https://github.com/writerslogic/holographic-memory) is an Apache-2.0 Rust library. This adapter uses whole-article lexical indexing with unstemmed tokens and positional postings. The tested revision of `main` is pinned in `Cargo.toml` and `Cargo.lock`. The Boolean, phrase and count execution it uses landed in [PR 200](https://github.com/writerslogic/holographic-memory/pull/200).
 
-## Supported queries
+## Queries
 
-| Query type | TOP_10 / TOP_100 / TOP_1000 | COUNT / TOP_N_COUNT |
-|---|---|---|
-| term, union (`a b`) | yes | yes |
-| intersection (`+a +b`) | UNSUPPORTED | UNSUPPORTED |
-| intersection_union (`+a b`) | UNSUPPORTED | UNSUPPORTED |
-| negated (`+a -b`) | UNSUPPORTED | UNSUPPORTED |
-| phrase (`"a b"`) | UNSUPPORTED | UNSUPPORTED |
+All 962 benchmark queries are supported: term, union, intersection, intersection_union, negated, phrase and two-phase-critic. Ranked commands and COUNT use the same Boolean contract. Required clauses must match; optional clauses score and are required only when there are no required clauses; excluded clauses remove matches. Empty and solely negative queries match nothing. Duplicate clauses are idempotent. Phrases are ordered, adjacent, allow overlapping occurrences and preserve repeated terms. Nonzero slop and syntax outside the benchmark's flat grammar fail explicitly.
 
-HMS search is a BM25 disjunction over the query's words. It has no required or excluded clause, and it stores no positions, so the engine answers `UNSUPPORTED` for any query containing `+`, `-` or `"`. `TOP_N_COUNT` runs the top-N search, then `count_documents`, as two calls.
+COUNT counts live articles without scoring. TOP_N_COUNT returns ranked hits and an exact article count. Set `HMS_LEXICAL_EXECUTION=auto|daat|wand|exhaustive` to select an execution path without rebuilding. WAND falls back to DAAT for unsupported shapes or unproven bounds. `HMS_DIFFERENTIAL=1` compares each result, including scores and tie order, with the full-scan/full-sort evaluator.
 
-## Differences from Lucene
+## Analyzer and scores
 
-- **Tokenization.** HMS splits on non-alphanumeric characters and lowercases. On this corpus, which `corpus_transform.py` has already reduced to lowercase ASCII letters and spaces, that matches whitespace tokenization. Words are indexed without stemming (`IngestOptions::unstemmed`).
-- **Scoring.** BM25 with k1 = 1.2, b = 0.75 and idf = ln(1 + (N - df + 0.5) / (df + 0.5)), as in Lucene. HMS keeps exact document lengths rather than Lucene's one-byte norms, and it scales scores by k1 + 1, which does not change the ranking.
-- **Long articles.** HMS indexes documents as chunks of at most 4,096 words, the largest size it accepts, with no overlap. 18,538 of the 5,032,104 articles (0.4%) are longer than that and are split into 40,643 chunks. For those articles, BM25 statistics (N, df, length) are per chunk and a ranked hit is a chunk. Counts are per article: a document is counted once however many of its chunks match.
-- **Empty articles.** 391,611 corpus lines have no words left after the transform. HMS rejects a document without text, so `build_index` skips them. They match no query in any engine.
-- **Index.** The store is an append-only journal that HMS replays into memory when it opens. It takes 1.5 GB on disk.
+HMS splits Unicode alphanumeric tokens, lowercases and disables stemming here. The transformed corpus is lowercase ASCII with spaces. Lucene and Tantivy apply different maximum-token-length filters; queried tokens are at most 14 characters. Count parity is checked separately from ranking parity.
+
+BM25 uses k1=1.2, b=0.75, `idf=ln(1+(N-df+.5)/(df+.5))`, exact article lengths and f64 arithmetic. Phrases use overlapping occurrence frequency and the sum of their terms' IDFs. Scores sort descending, then HMS document IDs ascending. Empty articles are skipped, so they do not contribute to HMS N or average length. External compressed norms, float width, empty-article statistics and phrase scoring can differ; external score/rank identity is not claimed.
+
+Whole-article mode preserves conjunctions, exclusions and phrases across the former 4,096-word and 64-KiB chunk boundaries, up to HMS's 8-MiB document limit. Empty articles are skipped; an article HMS refuses is reported on stderr and counted in the final `build_index` line.
+
+## Storage and verification
+
+The journal persists term frequencies and versioned delta-coded positions. Replay reconstructs 128-posting bitpacked blocks and conservative BM25 impacts. Shared immutable dictionaries and compact frequencies/offsets reduce memory without changing persisted term bytes. Older non-positional stores remain readable, and phrase queries on them return an explicit capability error.
+
+`uv run --no-project check_queries.py` checks the real binaries against an independent token-window count oracle and checks optimized/exhaustive equality for all queries, six commands and three execution choices. It includes repeated terms, negative-only queries, missing terms and the former chunk boundary.
 
 ## Resources
 
-On an Intel Core Ultra 9 185H, the full corpus needs about 14 GB of RAM, both to index and to serve. Each `serve` takes 3 to 5.5 minutes to open before it answers its first query, depending on host load, and the client starts one `serve` per command. The warmup progress bar stays at 0% during that time; the run has not hung. Indexing with 4 threads takes about 6 minutes.
+On an Intel Core Ultra 9 185H with 4 Rayon threads, indexing the full corpus takes about 8 minutes and peaks at 12.2 GB RSS. No article is refused. The store takes 4.25 GB on disk. Each `serve` replays the journal into memory for about 7 minutes before it answers its first query, at 12.1 GB RSS; the warmup progress bar stays at 0% during that time. The client starts one `serve` per command.
+
+Positions and whole-article indexing cost disk rather than memory. On the first 600,000 corpus lines at the same revision, the positional whole-article store takes 581 MB on disk against 212 MB for a non-positional store chunked at 4,096 words (2.7x), with peak indexing RSS of 1.85 GB against 2.08 GB.
