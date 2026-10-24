@@ -1,0 +1,16 @@
+{
+  "adapter-lock-sha256.txt": "23c1f21ca736b34af4c909ba5d9e4b29f960a1e5ab87ff0cc80167a472ad1f80",
+  "corpus-provenance.txt": "1bac1739a55e1ba2ad0d5fb59537f9587fe7afb5d77661e3ddd1deb15458e850",
+  "COUNT.results.json": "d139f3246583c84ecfc6a9ff06a8cbb086647bc361b649ed0445a1641fdf54fe",
+  "finished.txt": "51de5e4b49598af94e3c995487bbbfc417ef992a0344a99bedaf6b02f7a5e510",
+  "hms-binaries-sha256.txt": "a646019b3a968d271c0221c0d489c346b7326aa7a9d43edca4af3d42253f2269",
+  "index-allocated-bytes.txt": "2e3c3f42722b62279e97e26710d85f59f22b096ef0cd7abece8efa5e15e74df4",
+  "input-sha256.txt": "563d1d9ddfb4f7b4d3572820523cd9404faf1df89894433d59388ee8fd5d513f",
+  "started.txt": "537e82727c746f7b0a38e026313eb281ef860a2ea1ea855f01454f7b97d403bb",
+  "summary.json": "e09c6cf41509fbae80bbfde9cb8f551ec76d77647273009f3894150878ec07aa",
+  "TOP_10.results.json": "5cbf6c33dbac2229f1426527b0eaffaa90f09c54215a2e9d288b9b75b54dfead",
+  "TOP_100.results.json": "369a6ccdb7330f151257d3cf1c6732dbde12159f041f2a641e92e6977e26991f",
+  "TOP_1000.results.json": "42578538985edc2254637183115f03526d144ee1abd103fc5bcc11f6740a4e84",
+  "TOP_100_COUNT.results.json": "e7a0b38dd479a7dfb6f344c4bdf14cac9930860fcc5504e88c198a647fad1356",
+  "versions.txt": "d064f2224c2a7ec4363e16dba2ae1a8e71c45ee7d291f510c005791238a5d799"
+}

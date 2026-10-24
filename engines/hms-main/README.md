@@ -22,8 +22,8 @@ The journal persists term frequencies and versioned delta-coded positions. Repla
 
 `uv run --no-project check_queries.py` checks the real binaries against an independent token-window count oracle and checks optimized/exhaustive equality for all queries, six commands and three execution choices. It includes repeated terms, negative-only queries, missing terms and the former chunk boundary.
 
-## Resources
+## Resources and current measurements
 
-On an Intel Core Ultra 9 185H with 4 Rayon threads, indexing the full corpus takes about 8 minutes and peaks at 12.2 GB RSS. No article is refused. The store takes 4.25 GB on disk. Each `serve` replays the journal into memory for about 7 minutes before it answers its first query, at 12.1 GB RSS; the warmup progress bar stays at 0% during that time. The client starts one `serve` per command.
+The engine is pinned to `12c80decb094d57ee13ba187a01bf1de8788ca2f`. [Current results and raw evidence](RESULTS.md) cover all five commands, 962 queries and three engines rerun on the same host. HMS has higher whole-set mean latency than Tantivy and Lucene for each command; all per-type outcomes are retained. COUNT and TOP_100_COUNT counts agree on every query. TOP_K acknowledgement responses do not establish score/rank identity.
 
-Positions and whole-article indexing cost disk rather than memory. On the first 600,000 corpus lines at the same revision, the positional whole-article store takes 581 MB on disk against 212 MB for a non-positional store chunked at 4,096 words (2.7x), with peak indexing RSS of 1.85 GB against 2.08 GB.
+Serving kernel VmHWM observed during the final command was 12,876,028KiB; VmSwap reached 46,808KiB, so the timings carry a swap caveat. The allocated HMS index is 4,254,650,368 bytes. Its first request waits for journal replay, before timed passes. Earlier revision's resource estimates are superseded here; indexing peak/time were not measured separately in this run. PISA and IResearch native fallback measurements remain pending. This draft makes no published-standing claim.

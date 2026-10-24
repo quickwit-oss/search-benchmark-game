@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-holographic-memory = { git = "https://github.com/writerslogic/holographic-memory", rev = "30c569f5ce7854183c1e93a3a17277ca9a08c439" }
+holographic-memory = { git = "https://github.com/writerslogic/holographic-memory", rev = "12c80decb094d57ee13ba187a01bf1de8788ca2f" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 anyhow = "1.0"
