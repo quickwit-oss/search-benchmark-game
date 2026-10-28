@@ -1,0 +1,11 @@
+[
+  "Written in Rust.",
+  "Index is read from disk via mmap.",
+  "Doc-at-a-time.",
+  "Doc deltas, frequencies and positions are encoded using FOR-delta and blocks of size 128.",
+  "Single level of skip data inlined into postings, every 128 docs.",
+  "Impacts are inlined into skip data as an approximation only the optimal `(term_freq, norm)` pair for the block is stored.",
+  "This argmax is computed assuming the current segment statistics. During search, these args are reinjected into the BM25 formula with the global statistics.",
+  "Implements block-max WAND / block-max AND for top-k commands.",
+  "Disjunctions reorder/count matching doc IDs using bit sets over windows of 4,096 docs."
+]
