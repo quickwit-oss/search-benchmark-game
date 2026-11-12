@@ -1,0 +1,9 @@
+100  2.34G 100  2.34G   0      0  6.28M      0   06:21   06:21          6.63M
+ab4e69b72a139b2dd9df28ee59dc82e0a8b65d3de24c478e2fcc131423b1ad7f  wiki-articles.json.bz2
+b11c3c90041e4b88296f19c10b6469590bac200b76a4094a3b455e22e9bc71eb  corpus.json
+5032104 corpus.json
+released 2026-10-22T15:39:47Z
+82fd7ae35a884484818ba930fd286f2e0c20abe2c1beda4df4c2f9a89a2d5279  /home/davidcondrey/sol-lex/acquire-corpus.sh
+d9070fdf423e803afb4d31713a94f65ab10b9a420e9da4ceaf24827eb1ddf629  /home/davidcondrey/sol-lex/sbg/corpus_transform.py
+d9070fdf423e803afb4d31713a94f65ab10b9a420e9da4ceaf24827eb1ddf629  /home/davidcondrey/sbg-overnight-20261024/search-benchmark-game/corpus_transform.py
+First100 transformed cached source records separately checked identical, including seeded sort_field.

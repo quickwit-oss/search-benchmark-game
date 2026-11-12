@@ -1,0 +1,9 @@
+[
+  "Written in Rust; whole-article unstemmed lexical indexing with exact adjacent positions.",
+  "The journal is replayed into memory with shared dictionaries and compact frequencies/offsets.",
+  "128-posting bitpacked document gaps and frequencies, skip endpoints and conservative BM25 impact frontiers.",
+  "Document-at-a-time rarest-term conjunctions, exclusion cursors and phrase verification after conjunction filtering.",
+  "Block-max MaxScore for term disjunctions, strongest-blocks-first single-term top-k, block-skipping conjunctions; runtime DAAT/exhaustive overrides and fallback for unproven bounds.",
+  "Raw f64 BM25, exact article lengths, deterministic score/document-ID order and bounded buffered top-k.",
+  "COUNT is unscored; exact live-frequency shortcuts and union bitmaps count each article once."
+]
