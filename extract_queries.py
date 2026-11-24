@@ -18,6 +18,12 @@ def main():
     parser = argparse.ArgumentParser(description="Extract queries in tab-separated format for do_query")
     parser.add_argument("input", nargs="?", default="queries.txt", help="Input queries file (default: queries.txt)")
     parser.add_argument("--tag", default=None, help="Filter queries whose tags contain this substring")
+    parser.add_argument(
+        "--exclude",
+        action="append",
+        default=[],
+        help="Exclude queries whose tags contain this substring (repeatable)",
+    )
     parser.add_argument("--command", default="COUNT", help="Command to prepend (default: COUNT)")
     parser.add_argument("-o", "--output", default=None, help="Output file (default: stdout)")
     args = parser.parse_args()
@@ -30,6 +36,8 @@ def main():
             if args.tag is not None:
                 if not any(args.tag in t for t in entry["tags"]):
                     continue
+            if any(excluded in tag for excluded in args.exclude for tag in entry["tags"]):
+                continue
             out.write(f"{args.command}\t{entry['query']}\n")
 
     if args.output:
