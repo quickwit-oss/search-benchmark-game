@@ -1,0 +1,7 @@
+[
+  "Written in Rust.",
+  "Index is a WARM store (WarmCore) opened from disk; lexical postings with block impacts (checkpoint v3).",
+  "Whole article is one lexical chunk, unstemmed, token positions kept, text not stored.",
+  "Union top-k uses block-max MaxScore; intersections and phrases use posting cursors.",
+  "BM25 k1=1.2, b=0.75."
+]

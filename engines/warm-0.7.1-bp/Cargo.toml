@@ -1,0 +1,17 @@
+[package]
+name = "warm-bench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# The published crate, pinned to the exact release the engine is named for.
+warm-rust = "=0.7.1"
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+mimalloc = { version = "0.1", default-features = false }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
