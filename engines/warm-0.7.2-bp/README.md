@@ -2,10 +2,10 @@
 
 [WARM](https://github.com/writerslogic/warm) is an Apache-2.0 Rust engine for local search and
 agent memory. This engine builds against the published crate, pinned to the exact
-`warm-rust = "=0.7.1"` release the engine is named for, with `Cargo.lock` committed.
+`warm-rust = "=0.7.2"` release the engine is named for, with `Cargo.lock` committed.
 
 Compaction reorders documents by recursive graph bisection, the technique behind the Lucene `-bp`
-column, so this engine is named `warm-0.7.1-bp`. The adapter has no setting that skips the
+column, so this engine is named `warm-0.7.2-bp`. The adapter has no setting that skips the
 reordering.
 
 ## Queries
