@@ -680,9 +680,9 @@ dependencies = [
 
 [[package]]
 name = "warm-rust"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "039bbf9c9c338d0b9137055818c500cdd186204e1e37113613d93865d631385c"
+checksum = "63ff96a4d3492dcb9e1c1a6a151b58fa933195544dc4d1a8bcb19b1598e3cc21"
 dependencies = [
  "anyhow",
  "base64",
