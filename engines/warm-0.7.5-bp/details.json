@@ -1,0 +1,8 @@
+[
+  "Written in Rust.",
+  "Index is a WARM store (WarmCore) opened from disk; lexical postings with block impacts, skip tables and word positions (checkpoint v4).",
+  "Whole article is one lexical chunk, unstemmed, token positions kept, text not stored.",
+  "Tables derived from the index (word counts and classes, rank tables, union window bounds, direct frequency tables of the longest lists) are written into the checkpoint at index time and read at open; no query builds or keeps one.",
+  "Union top-k uses block-max MaxScore; intersections and phrases use posting cursors.",
+  "BM25 with WARM's defaults (k1 = 1.2, b = 0.75, as tantivy and infino); the (k1+1) numerator is a constant factor and does not change ranking."
+]

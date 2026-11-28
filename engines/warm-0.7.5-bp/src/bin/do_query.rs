@@ -5,20 +5,6 @@ use anyhow::{bail, Context, Result};
 use writerslogic_warm::core::documents::{LexicalExecution, LexicalOptions, LexicalQuery};
 use writerslogic_warm::WarmCore;
 use std::io::{BufRead, Write};
-use std::time::{Duration, Instant};
-
-/// The harness starts the next command's server as soon as it closes this one's input, so the
-/// store lock may still be held for a moment by the previous process.
-fn open(path: &str) -> Result<WarmCore> {
-    let deadline = Instant::now() + Duration::from_secs(60);
-    loop {
-        match WarmCore::new(1024, Some(path.to_owned()), None) {
-            Ok(core) => return Ok(core),
-            Err(_) if Instant::now() < deadline => std::thread::sleep(Duration::from_millis(100)),
-            Err(error) => return Err(error),
-        }
-    }
-}
 
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
@@ -26,7 +12,7 @@ fn main() -> Result<()> {
     let path = std::env::args()
         .nth(1)
         .context("usage: do_query <index dir>")?;
-    let core = open(&path)?;
+    let core = WarmCore::new(1024, Some(path), None)?;
     if std::env::var_os("WARM_RESOURCE_RECEIPT").is_some() {
         let status = std::fs::read_to_string("/proc/self/status")
             .context("read Linux memory receipt after reopening")?;
@@ -62,39 +48,27 @@ fn main() -> Result<()> {
             "TOP_10_COUNT" => (10, true),
             "TOP_100_COUNT" => (100, true),
             "TOP_1000_COUNT" => (1000, true),
-            _ => {
+            // The only commands outside the supported list are the TOP_*_FF ones.
+            other if other.starts_with("TOP_") && other.ends_with("_FF") => {
                 writeln!(out, "UNSUPPORTED")?;
                 out.flush()?;
                 continue;
             }
+            other => bail!("unknown command {other:?}"),
         };
-        // A query outside the supported grammar is reported, not fatal to the server.
-        let query = match LexicalQuery::parse(text) {
-            Ok(query) => query,
-            Err(error) => {
-                eprintln!("unsupported query {text:?}: {error:#}");
-                writeln!(out, "UNSUPPORTED")?;
-                out.flush()?;
-                continue;
-            }
-        };
+        // A query that does not parse or a search that fails is a defect, not an unsupported
+        // command: it stops the server with the error.
+        let query = LexicalQuery::parse(text)
+            .with_context(|| format!("parse query {text:?}"))?;
         let options = LexicalOptions {
             k,
             count,
             execution,
             ..Default::default()
         };
-        // A query the store cannot answer (a phrase over an index without positions) is
-        // reported, not fatal to the server.
-        let result = match core.search_lexical(&query, &options) {
-            Ok(result) => result,
-            Err(error) => {
-                eprintln!("unsupported query {text:?}: {error:#}");
-                writeln!(out, "UNSUPPORTED")?;
-                out.flush()?;
-                continue;
-            }
-        };
+        let result = core
+            .search_lexical(&query, &options)
+            .with_context(|| format!("search {command} {text:?}"))?;
         if differential {
             let reference = core.search_lexical(
                 &query,

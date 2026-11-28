@@ -30,10 +30,11 @@ fn input(ordinal: u64, text: String, chunk_words: u32) -> DocumentInput {
 struct Indexer {
     core: WarmCore,
     options: IngestOptions,
-    rejected: u64,
 }
 
 impl Indexer {
+    /// Indexes every document of `batch`. A batch over the size limit is halved and both halves
+    /// are indexed; any other error, including a rejected document, stops the build.
     fn commit(&mut self, batch: Vec<DocumentInput>) -> Result<()> {
         match self
             .core
@@ -46,17 +47,11 @@ impl Indexer {
                 self.commit(batch)?;
                 self.commit(tail)
             }
-            Err(_) if batch.len() > 1 => {
-                for document in batch {
-                    self.commit(vec![document])?;
-                }
-                Ok(())
-            }
             Err(error) => {
-                let document = batch.into_iter().next().context("empty batch")?;
-                eprintln!("rejected document {}: {error:#}", document.id);
-                self.rejected += 1;
-                Ok(())
+                let first = batch.first().map_or("?", |document| document.id.as_str());
+                Err::<(), _>(error).with_context(|| {
+                    format!("indexing a batch of {} documents from {first}", batch.len())
+                })
             }
         }
     }
@@ -72,13 +67,11 @@ fn main() -> Result<()> {
             encode: EncodeMode::Lexical,
             // The benchmark indexes words as written: no stemming.
             unstemmed: true,
-            // Diagnostic variant: WARM_NO_POSITIONS=1 keeps no positions, which lets the store
-            // take a checkpoint, and cuts each article into 4096-word chunks (so counts and
-            // intersections are chunk-level, not article-level).
-            positions: std::env::var_os("WARM_NO_POSITIONS").is_none(),
-            whole_document: std::env::var_os("WARM_NO_POSITIONS").is_none(),
+            // Each article is one chunk with word positions, so counts, intersections and
+            // phrases are article-level.
+            positions: true,
+            whole_document: true,
         },
-        rejected: 0,
     };
     let (mut ordinal, mut empty) = (0u64, 0u64);
     let mut batch = Vec::with_capacity(MAX_BATCH_ITEMS);
@@ -93,7 +86,9 @@ fn main() -> Result<()> {
             println!("{ordinal}");
         }
         if doc.text.trim().is_empty() {
-            // WARM refuses a document without words; such an article matches no query.
+            // An article with no words has no postings in any engine and matches no query, and
+            // WARM does not take a document without words. It is counted and reported, not a
+            // rejection: every document WARM is given must be accepted.
             empty += 1;
             continue;
         }
@@ -108,10 +103,7 @@ fn main() -> Result<()> {
     // The explicit compaction reorders the documents (document_checkpoint.reorder).
     indexer.core.compact()?;
     indexer.core.flush()?;
-    println!(
-        "{ordinal} documents read, {empty} without words skipped, {} rejected",
-        indexer.rejected
-    );
+    println!("{ordinal} documents read, {empty} without words not indexed, every other one indexed");
     if std::env::var_os("WARM_RESOURCE_RECEIPT").is_some() {
         let status = std::fs::read_to_string("/proc/self/status")
             .context("read Linux memory receipt after indexing")?;
