@@ -36,7 +36,8 @@ The checkpoint is version 4: block-encoded postings with impacts, skip tables an
 positions, and a section of tables derived from the index, written when the checkpoint is
 written: per-slot word counts and classes, per-list rank tables, union window bounds, and
 direct frequency tables for the longest lists (every list with at least 512 postings and a 1/32
-share of the slots, longest first, within a 32 MiB budget or 128 tables). Which lists get a
+share of the slots, longest first, within 32 MiB or the size of 128 tables, whichever is larger, and at most 512 MiB
+and one eighth of the index). Which lists get a
 table depends only on the index. `do_query` opens the store, reads those tables and keeps no
 state between queries that depends on them. `WARM_DENSE_TABLES=0` opens without the direct
 frequency tables so their effect can be checked; results are identical. The binaries use the
